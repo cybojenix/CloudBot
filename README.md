@@ -3,6 +3,7 @@
 ## About
 
 CloudBot is a Python IRC bot very heavily based on [Skybot](http://git.io/skybot) by [rmmh](http://git.io/rmmh).
+# This is the bot that is located on #cafogen @ freenode
 
 ### Goals
 
