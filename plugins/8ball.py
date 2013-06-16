@@ -14,10 +14,27 @@ with open("plugins/data/8ball_responses.txt") as f:
 
 
 @hook.command('8ball')
-def eightball(input, me=None):
-    "8ball <question> -- The all knowing magic eight ball, " \
-    "in electronic form. Ask and it shall be answered!"
+def eightball(inp, conn=None, chan=None, nick=''):
+    "8ball [channel] <question> -- The all knowing magic eight ball, " \
+    "in electronic form. Ask and it shall be answered!" \
+    "If [channel] is blank the bot will answer the question in the channel the " \
+    "command was used in."
 
     # here we use voodoo magic to tell the future
     magic = multiword_replace(random.choice(responses), color_codes)
-    me("shakes the magic 8 ball... %s" % magic)
+
+    inp = inp.split(" ")
+    
+    if inp[0][0] == "#":
+	message = "(" + nick + ") "
+        for x in inp[1:]:
+            message = message + x + " "
+	message = message[:-1]:
+	out = "PRIVMSG %s :%s" % (inp[0], message)
+	conn.send(out)
+	message = "the magic 8 ball says..." + magic
+        out = "PRIVMSG %s :%s" % (inp[0], message)
+    else:
+	message = "the magic 8 ball says..." + magic
+        out = "PRIVMSG %s :%s" % (chan, message)
+    conn.send(out)
