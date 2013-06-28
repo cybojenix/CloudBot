@@ -12,14 +12,14 @@ if not os.path.exists('config'):
         {
           "connections":
           {
-            "EsperNet":
+            "Freenode":
             {
-              "server": "irc.esper.net",
-              "nick": "MyNewCloudBot",
-              "user": "cloudbot",
-              "realname": "CloudBot - http://git.io/cloudbotirc",
+              "server": "irc.freenode.net",
+              "nick": "cafobot",
+              "user": "cafobot",
+              "realname": "CafoBot - http://git.io/KczkZw",
               "nickserv_password": "",
-              "channels": ["#cloudbot"],
+              "channels": ["#cafogen"],
               "invite_join": true,
               "auto_rejoin": false,
               "command_prefix": "."
