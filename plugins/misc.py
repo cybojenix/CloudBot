@@ -35,6 +35,8 @@ def onjoin(paraml, conn=None, bot=None):
     if mode:
         conn.cmd('MODE', [conn.nick, mode])
 
+# our server runs too fast. make it pause a few seconds to allow it to authenticate
+    time.sleep(5)
 # Join config-defined channels
     for channel in conn.channels:
         conn.join(channel)
