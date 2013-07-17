@@ -2,7 +2,7 @@
 get_version() {
 	wget -q http://www.slimroms.net/index.php/downloads/all/viewcategory/399-grouper
 	off_string=$(grep -Po -m 1 "Slim-grouper.*-OFFICIAL" 399-grouper | grep -Po '\d+(\.\d+)*-')
-	echo ${off_string:0:1} > version-bridge
+	echo "${off_string%?}" > version-bridge
 	rm 399-grouper
 	
 	wget -q http://www.slimroms.net/index.php/downloads/all/viewcategory/624-grouper
