@@ -40,3 +40,30 @@ def slimdevices(inp, conn=None, chan=None, nick=''):
 	
 	out = "PRIVMSG %s :%s" % (chan, message[:-2])
 	conn.send(out)
+
+@hook.command		
+def slimsearch(inp, conn=None, chan=None, nick=''):
+	"slimsearch - query the list of devices to get the url from the website," \
+	" for a list of devices, run slimdevices"
+	
+	urllib.urlretrieve("http://otaslim.slimroms.net/ota.xml", "plugins/data/ota.xml")
+	
+	inp = inp.split(" ")
+	search = inp[0]
+	message = ""
+	root = ET.parse('plugins/data/ota.xml').getroot()
+	
+	for url in root.iter(search):
+		output_url = url[1].text
+		
+	try:
+		output_url
+	except NameError:
+		message =  search + " not found, please run the slimdevices command"
+		notice(message)
+	else:
+		message =  "(" + nick + ") " + search + ": " + output_url
+		out = "PRIVMSG %s :%s" % (chan, message)
+		conn.send(out)
+		
+	os.remove('plugins/data/ota.xml')
