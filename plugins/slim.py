@@ -1,7 +1,47 @@
+import time
 import os
 import urllib
 import xml.etree.ElementTree as ET
 from util import hook
+import re
+
+@hook.singlethread
+@hook.event('*')
+def slimtest(inp, conn=None):
+	urllib.urlretrieve("http://otaslim.slimroms.net/ota.xml", "plugins/data/ota.xml")
+	root = ET.parse('plugins/data/ota.xml').getroot()
+	global official_version
+	
+	for child in root[0].findall('grouper'):
+		cur_official_version = child[0].text
+	
+	m = re.search('\d+(\.\d+)*-', cur_official_version)
+	cur_official_version = m.group(0)[:-1]
+	
+	try:
+		official_version
+	except NameError:
+		official_version = cur_official_version
+	else:
+#		if re.search('\d+\.\d+(\.\d+)+', official_version) or \ # will come back to this later
+#		re.search('\d+\.\d+(\.\d+)+', cur_official_version):
+			if not official_version == cur_official_version:
+				official_version = cur_official_version
+				
+				channel = "#slimusers"
+				message = "a new version of slimrom is is released, version " + official_version
+				out = "NOTICE %s :%s" % (channel, message)
+				conn.send(out)
+	time.sleep(300)
+
+#@hook.singlethread
+#@hook.event('*')
+#def slimtest(inp, conn=None):
+#    channel = "#cafogen"
+#    message = "test, sorry"
+#    out = "NOTICE %s :%s" % (channel, message)
+#    conn.send(out)
+#    time.sleep(300)
 
 @hook.command(autohelp=False)
 def slimversion(inp, conn=None, chan=None, nick=''):
