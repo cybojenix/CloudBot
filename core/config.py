@@ -49,6 +49,11 @@ if not os.path.exists('config'):
             "ignore":
             {
               "ignored": []
+            },
+            "help":
+            {
+              "slimchans": [],
+	      "slimplugins": [],
             }
           },
           "censored_strings":
