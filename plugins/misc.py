@@ -39,7 +39,12 @@ def onjoin(paraml, conn=None, bot=None):
     time.sleep(5)
 # Join config-defined channels
     for channel in conn.channels:
-        conn.join(channel)
+	try:
+	    conn.conf['channelkeys'][channel]
+	except KeyError:
+	    conn.join(channel, '')
+	else:
+            conn.join(channel, conn.conf['channelkeys'][channel])
         time.sleep(1)
 
     print "Bot ready."
