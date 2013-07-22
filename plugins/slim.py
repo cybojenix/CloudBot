@@ -99,3 +99,22 @@ def slimsearch(inp, notice=None, say=None):
 	else:
 		message = search + ": " + output_url
 		say(message)
+
+@hook.command
+def slimdetect(inp, conn=None, chan=None):
+    global slimuser
+    global slimchannel
+    inp = inp.split(" ")
+    slimuser = inp[0]
+    slimchannel = chan
+    message = "\001%s\001" % ("VERSION")
+    out = "PRIVMSG %s :%s" % (slimuser, message)
+    conn.send(out)
+
+@hook.event("NOTICE")
+def ctcp_capture(inp, conn=None, input=None):
+        print input.msg
+        if "VERSION" in input.msg:
+            message = slimuser + "-" + input.msg.replace('\x01', '')
+            out = "PRIVMSG %s :%s" % (slimchannel, message)
+            conn.send(out)
