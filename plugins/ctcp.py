@@ -1,6 +1,7 @@
 import time
 from util import hook
 
+
 # CTCP responses
 @hook.regex(r'^\x01VERSION\x01$')
 def ctcp_version(inp, notice=None):
