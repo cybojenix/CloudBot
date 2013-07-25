@@ -3,6 +3,7 @@ import random
 from util import hook
 import os
 import json
+import time
 
 @hook.command(autohelp=False)
 def load(inp, say=None, me=None, chan=None):
@@ -25,7 +26,7 @@ def load(inp, say=None, me=None, chan=None):
 	
 	bullet_place = []
 	
-	me("loads the bullets, spins the barrell...")
+	me("loads the bullets, spins the barrel...")
 	for x in range(no_bullet):
 		bul_pl = random.randint(1, no_barrels)
 		while bul_pl in bullet_place:
@@ -55,6 +56,8 @@ def pull(inp, say=None, nick=None, notice=None, me=None, chan=None):
 		if no_bullet == 0:
 			notice("please start a game with command load")
 		else:
+			say("click....")
+			time.sleep(2)
 			current_position += 1
 			if current_position in bullet_place:
 				say("BANG!! %s is DEAD" % nick)
@@ -63,7 +66,6 @@ def pull(inp, say=None, nick=None, notice=None, me=None, chan=None):
 					me("drags the body off...")
 					out = "KICK %s %s : you died...." % (chan, nick)
 			else:
-				say("click...")
 				say("%s gets to live another day.." % nick)
 			if no_bullet == 0:
 				say("there are no bullets left")
