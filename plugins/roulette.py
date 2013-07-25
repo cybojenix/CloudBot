@@ -47,7 +47,7 @@ def load(inp, say=None, me=None, chan=None):
 			bul_pl = random.randint(1, no_barrels)
 		bullet_place.append(bul_pl)
 	
-	data = json.dumps({'no_bullet': no_bullet, 'current_position': 0, 'bullet_place': bullet_place})
+	data = json.dumps({'no_bullet': no_bullet, 'current_position': 0, 'bullet_place': bullet_place, 'dead': []})
 	with open(file, 'w+') as final_file:
 		final_file.write(data)
 	
@@ -66,25 +66,31 @@ def pull(inp, say=None, nick=None, notice=None, me=None, chan=None):
 		no_bullet = data["no_bullet"]
 		current_position = data["current_position"]
 		bullet_place = data["bullet_place"]
+		dead = data["dead"]
 		
-		if no_bullet == 0:
-			notice("please start a game with command load")
+		if nick in dead:
+			say("you can not shoot if you are dead %s" % nick)
 		else:
-			say("click....")
-			time.sleep(2)
-			current_position += 1
-			if current_position in bullet_place:
-				say("BANG!! %s is DEAD" % nick)
-				no_bullet -= 1
-				if chan[0] == "#":
-					me("drags the body off...")
-					out = "KICK %s %s : you died...." % (chan, nick)
-			else:
-				say("%s gets to live another day.." % nick)
 			if no_bullet == 0:
-				say("there are no bullets left")
+				notice("please start a game with command load")
+			else:
+				say("click....")
+				time.sleep(2)
+				current_position += 1
+				if current_position in bullet_place:
+					say("BANG!! %s is DEAD" % nick)
+					no_bullet -= 1
+					dead.append(nick)
+				
+					if chan[0] == "#":
+						me("drags the body off...")
+						out = "KICK %s %s : you died...." % (chan, nick)
+				else:
+					say("%s gets to live another day.." % nick)
+				if no_bullet == 0:
+					say("there are no bullets left")
 
-			data = json.dumps({'no_bullet': no_bullet, 'current_position': current_position, 'bullet_place': bullet_place})
-			with open(file, 'w+') as final_file:
-				final_file.write(data)
+				data = json.dumps({'no_bullet': no_bullet, 'current_position': current_position, 'bullet_place': bullet_place, 'dead': dead})
+				with open(file, 'w+') as final_file:
+					final_file.write(data)
 			
