@@ -21,8 +21,22 @@ def load(inp, say=None, me=None, chan=None):
 		no_bullet = 1
 	else:
 		inp = inp.split(" ")
-		no_barrels = inp[0]
-		no_bullet = inp[1]
+		try:
+			inp[0]
+			inp[1]
+		except IndexError:
+			no_barrels = 6
+			no_bullet = 1
+		else:
+			try:
+				int(inp[0])
+				int(inp[1])
+			except ValueError:
+				no_barrels = 6
+				no_bullet = 1
+			else:
+				no_barrels =int(inp[0])
+				no_bullet = int(inp[1])
 	
 	bullet_place = []
 	
