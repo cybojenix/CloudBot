@@ -57,6 +57,11 @@ if not os.path.exists('config'):
 	      "slimplugins": [],
             }
           },
+          "slim":
+          {
+            "slimchan": [],
+            "slimmembers": []
+          },
           "censored_strings":
           [
             "mypass",

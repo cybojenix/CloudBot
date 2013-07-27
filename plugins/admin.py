@@ -150,7 +150,7 @@ def say(inp, conn=None, chan=None, notice=None):
 
 
 @hook.command("act", adminonly=True)
-@hook.command(adminonly=True)
+@hook.command(adminlevel = "slim")
 def me(inp, conn=None, chan=None, notice=None):
     "me [channel] <action> -- Makes the bot act out <action> in [channel]. " \
     "If [channel] is blank the bot will act the <action> in the channel the " \

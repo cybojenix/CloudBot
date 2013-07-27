@@ -29,11 +29,20 @@ def sieve_suite(bot, input, func, kind, args):
             if input.chan.lower() in denied_channels:
                 return None
 
-    if args.get('adminonly', False):
+    if args.get('adminlevel', False) == "admin" or args.get('adminonly', False): # for now give backwards compatibility
         admins = bot.config.get('admins', [])
 
         if input.nick not in admins and input.mask not in admins:
             input.notice("Sorry, you are not allowed to use this command.")
             return None
-
+    elif args.get('adminlevel', False) == "slim":
+        slimchans = bot.config["slim"]["slimchans"]
+        slimmembers = bot.config["slim"]["slimmembers"]
+	admins = bot.config.get('admins', [])
+	if input.nick in admins or input.mask in admins:
+		return input
+        elif  input.chan in slimchans:
+        	if input.nick not in slimmembers and input.mask not in slimmembers:
+			input.notice("Sorry, you are not allowed to use this command.")
+			return None
     return input
