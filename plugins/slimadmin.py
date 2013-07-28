@@ -2,7 +2,7 @@ from util import hook
 import json
 
 @hook.command(adminlevel = "slim")
-def addslimadmin(inp, notice=None):
+def addslimadmin(inp, notice=None, bot=None):
     "addslimadmin <host> -- Make <host> a slimadmin. " \
     "(you can add multiple slimadmins at once)"
     targets = inp.split()
