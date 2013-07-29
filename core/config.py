@@ -20,7 +20,6 @@ if not os.path.exists('config'):
               "realname": "CafoBot - http://git.io/KczkZw",
               "nickserv_password": "",
               "channels": ["#cafogen"],
-	      "channelkeys": {},
               "invite_join": true,
               "auto_rejoin": false,
               "command_prefix": "."
