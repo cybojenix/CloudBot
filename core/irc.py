@@ -188,10 +188,7 @@ class IRC(object):
 
     def join(self, channel, key=''):
         """ makes the bot join a channel """
-	if key == '':
-            self.send("JOIN %s" % channel)
-        else:
-	    self.send("JOIN %s" % channel + " " + key)
+        self.send("JOIN %s" % channel)
         if channel not in self.channels:
             self.channels.append(channel)
 
