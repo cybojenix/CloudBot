@@ -32,17 +32,30 @@ def sieve_suite(bot, input, func, kind, args):
     if args.get('adminlevel', False) == "admin" or args.get('adminonly', False): # for now give backwards compatibility
         admins = bot.config.get('admins', [])
 
-        if input.nick not in admins and input.mask not in admins:
+        if input.user not in admins and input.mask not in admins:
             input.notice("Sorry, you are not allowed to use this command.")
             return None
-    elif args.get('adminlevel', False) == "slim":
+    elif args.get('adminlevel', False) == "slimadmin":
         slimchans = bot.config["slim"]["slimchans"]
         slimmembers = bot.config["slim"]["slimmembers"]
 	admins = bot.config.get('admins', [])
-	if input.nick in admins or input.mask in admins:
+	if input.user in admins or input.mask in admins:
 		return input
         elif  input.chan in slimchans:
-        	if input.nick not in slimmembers and input.mask not in slimmembers:
+        	if input.user not in slimmembers and input.mask not in slimmembers:
 			input.notice("Sorry, you are not allowed to use this command.")
 			return None
+	else:
+		input.notice("Sorry, you are not allowed to use this command.")
+		return None
+    elif args.get('adminlevel', False) == "slim":
+	slimchans = bot.config["slim"]["slimchans"]
+        slimmembers = bot.config["slim"]["slimmembers"]
+        admins = bot.config.get('admins', [])
+        if input.user in admins or input.mask in admins:
+                return input
+        elif  input.chan in slimchans:
+                if input.user not in slimmembers and input.mask not in slimmembers:
+                        input.notice("Sorry, you are not allowed to use this command in this channel.")
+                        return None
     return input
