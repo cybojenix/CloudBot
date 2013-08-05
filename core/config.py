@@ -7,70 +7,8 @@ def save(conf):
     json.dump(conf, open('config', 'w'), sort_keys=True, indent=2)
 
 if not os.path.exists('config'):
-    open('config', 'w').write(inspect.cleandoc(
-        r'''
-        {
-          "connections":
-          {
-            "Freenode":
-            {
-              "server": "irc.freenode.net",
-              "nick": "cafobot",
-              "user": "cafobot",
-              "realname": "CafoBot - http://git.io/KczkZw",
-              "nickserv_password": "",
-              "channels": ["#cafogen"],
-              "invite_join": true,
-              "auto_rejoin": false,
-              "command_prefix": "."
-            }
-          },
-          "disabled_plugins": [],
-          "disabled_commands": [],
-          "acls": {},
-          "api_keys":
-          {
-            "tvdb": "",
-            "wolframalpha": "",
-            "lastfm": "",
-            "rottentomatoes": "",
-            "twitter_consumer_key": "",
-            "twitter_consumer_secret": "",
-            "twitter_access_token": "",
-            "twitter_access_secret": "",
-            "wunderground": ""
-          },
-          "plugins":
-          {
-            "factoids":
-            {
-              "prefix": false
-            },
-            "ignore":
-            {
-              "ignored": []
-            },
-            "help":
-            {
-              "slimchans": [],
-	      "slimplugins": [],
-            }
-          },
-          "slim":
-          {
-            "slimchan": [],
-            "slimmembers": []
-          },
-          "censored_strings":
-          [
-            "mypass",
-            "mysecret"
-          ],
-          "admins": ["myname@myhost"]
-        }''') + '\n')
-    print "Config generated!"
-    print "Please edit the config now!"
-    print "For help, see http://git.io/cloudbotircwiki"
+    print "Please rename 'config.default' to 'config' to set up your bot!"
+    print "For help, see http://git.io/cloudbotirc"
     print "Thank you for using CloudBot!"
     sys.exit()
 
@@ -87,4 +25,3 @@ def config():
 
 
 bot._config_mtime = 0
-

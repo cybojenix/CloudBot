@@ -32,11 +32,18 @@ def isgd(url):
         return request["shorturl"]
 
 
-def haste(text):
+def try_isgd(url):
+    try:
+        out = isgd(url)
+    except (ShortenError, http.HTTPError):
+        out = url
+    return out
+
+def haste(text, ext='txt'):
     """ pastes text to a hastebin server """
     page = http.get(paste_url + "/documents", post_data=text)
     data = json.loads(page)
-    return("%s/%s.txt" % (paste_url, data['key']))
+    return("%s/%s.%s" % (paste_url, data['key'], ext))
 
 
 def query(query, params={}):

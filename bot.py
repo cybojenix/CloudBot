@@ -15,9 +15,9 @@ import Queue
 import sys
 import time
 import platform
+import re
 
-sys.path += ['plugins']  # so 'import hook' works without duplication
-sys.path += ['lib']
+sys.path += ['plugins', 'lib']  # so 'import hook' works without duplication
 os.chdir(sys.path[0] or '.')  # do stuff relative to the install directory
 
 
@@ -37,6 +37,7 @@ print "Operating System: %s, Python " \
         "" % (opsys, python_imp, python_ver, architecture)
 
 bot = Bot()
+bot.vars = {}
 bot.start_time = time.time()
 
 print 'Loading plugins...'
@@ -56,6 +57,9 @@ bot.conns = {}
 
 try:
     for name, conf in bot.config['connections'].iteritems():
+        # strip all spaces and capitalization from the connection name
+        name = name.replace(" ", "_")
+        name = re.sub('[^A-Za-z0-9_]+', '', name)
         print 'Connecting to server: %s' % conf['server']
         if conf.get('ssl'):
             bot.conns[name] = SSLIRC(name, conf['server'], conf['nick'], conf=conf,

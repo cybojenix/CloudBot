@@ -17,11 +17,13 @@ def decode(txt):
 
 
 def censor(text):
+    text = text.replace('\n', '').replace('\r', '')
     replacement = '[censored]'
     if 'censored_strings' in bot.config:
-        words = map(re.escape, bot.config['censored_strings'])
-        regex = re.compile('(%s)' % "|".join(words))
-        text = regex.sub(replacement, text)
+        if bot.config['censored_strings']:
+            words = map(re.escape, bot.config['censored_strings'])
+            regex = re.compile('(%s)' % "|".join(words))
+            text = regex.sub(replacement, text)
     return text
 
 
@@ -130,6 +132,7 @@ class IRC(object):
         self.server = server
         self.port = port
         self.nick = nick
+        self.vars = {}
 
         self.out = Queue.Queue()  # responses from the server are placed here
         # format: [rawline, prefix, command, params,
@@ -165,7 +168,7 @@ class IRC(object):
             else:
                 prefix, command, params = irc_noprefix_rem(msg).groups()
             nick, user, host = irc_netmask_rem(prefix).groups()
-            mask = user + "@" + host
+            mask = nick + "!" + user + "@" + host
             paramlist = irc_param_ref(params)
             lastparam = ""
             if paramlist:
