@@ -9,7 +9,7 @@ import re, mmap
 @hook.event('*')
 def slimtest(inp, conn=None):
 	urllib.urlretrieve("http://otaslim.slimroms.net/ota.xml", "plugins/data/ota.xml")
-	urllib.urlretrieve("http://www.slimroms.net/index.php/downloads/all/viewcategory/624-grouper", "plugins/data/624-grouper")
+	urllib.urlretrieve("http://slimroms.net/index.php/downloads/dlsearch/viewcategory/624-grouper", "plugins/data/624-grouper")
 	root = ET.parse('plugins/data/ota.xml').getroot()
 	global official_version
 	global weekly_version
@@ -121,8 +121,9 @@ def ctcp_capture(inp, conn=None, input=None):
 
 @hook.event("JOIN")
 def slimjoin(inp, notice=None, chan=None):
-	if chan == "#slimusers":
+	if chan == "#slimbot":
 	    time.sleep(5)
-	    notice("hello and welcome to the slim support channel")
-	    notice("for assistance please call a member with an @ or + sign")
-	    notice("or just enter .help")
+	    message = "hello and welcome to the slim support channel\n"
+	    message = message + "for assistance please call a member with an @ or + sign\n"
+	    message = message + "or just enter .help"
+	    notice(message)

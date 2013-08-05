@@ -37,12 +37,14 @@ def sieve_suite(bot, input, func, kind, args):
 
     if args.get('permissions', False):
         groups = bot.config.get("permissions", [])
+	print "groups %s" % groups
 
         allowed_permissions = args.get('permissions', [])
         allowed_groups = []
 
         # loop over every group
         for key, value in groups.iteritems():
+	    print "key" + key
             # loop over every permission the command allows
             for permission in allowed_permissions:
                 # see if the group has that permission
