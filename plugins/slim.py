@@ -118,12 +118,3 @@ def ctcp_capture(inp, conn=None, input=None):
             message = slimuser + "-" + input.msg.replace('\x01', '')
             out = "PRIVMSG %s :%s" % (slimchannel, message)
             conn.send(out)
-
-@hook.event("JOIN")
-def slimjoin(inp, notice=None, chan=None):
-	if chan == "#slimbot":
-	    time.sleep(5)
-	    message = "hello and welcome to the slim support channel\n"
-	    message = message + "for assistance please call a member with an @ or + sign\n"
-	    message = message + "or just enter .help"
-	    notice(message)
