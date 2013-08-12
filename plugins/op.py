@@ -7,12 +7,12 @@ def mode_cmd(mode, text, inp, chan, conn, notice):
     if split[0].startswith("#"):
         channel = split[0]
         target = split[1]
-        notice("Attempting to {} {} in {}...".format(target, text, channel))
+        notice("Attempting to {} {} in {}...".format(text, target, channel))
         conn.send("MODE {} {} {}".format(channel, mode, target))
     else:
         channel = chan
         target = split[0]
-        notice("Attempting to {} {} in {}...".format(target, text, channel))
+        notice("Attempting to {} {} in {}...".format(text, target, channel))
         conn.send("MODE {} {} {}".format(channel, mode, target))
 
 @hook.command(permissions=["op_ban", "op"])
@@ -118,4 +118,17 @@ def kick(inp, chan=None, conn=None, notice=None):
             out = "KICK {} {}".format(channel, target)
 
     notice("Attempting to kick {} from {}...".format(target, channel))
+    conn.send(out)
+
+@hook.command(permissions=["op_rem", "op"])
+def remove(inp, chan=None, conn=None, notice=None):
+    "remove [channel] [user] -- Force a user to part from a channel."
+    split = inp.split(" ")
+    if split[0].startswith("#"):
+        message = " ".join(split[1:])
+        chan = split[0]
+        out = "REMOVE {} :{}".format(chan, message)
+    else:
+        message = " ".join(split)
+        out = "REMOVE {} :{}".format(chan, message)
     conn.send(out)

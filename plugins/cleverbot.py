@@ -99,18 +99,9 @@ def ask(inp):
     MsgList.append(text)
     return text
 
-@hook.regex(r'^slimbot(:|;|,).+')
 @hook.command("cb")
-def cleverbot(inp, input=None, reply=None, bot=None, notice=None):
-    "cleverbot [message] -- link up to the cleverbot api for an ai bot"
-    is_in=False
-    if not input.msg.split(" ")[0][0] == ".":
-        for k in bot.commands:
-            if input.msg.split(" ")[1] in k:
-                notice("%s is a command, sorry" % input.msg.split(" ")[1])
-                is_in=True
-    if not is_in:
-        reply(ask(" ".join(input.msg.split(" ")[1:])))
+def cleverbot(inp, reply=None):
+    reply(ask(inp))
 
 ''' # TODO: add in command to control extra verbose per channel
 @hook.event('PRIVMSG')
