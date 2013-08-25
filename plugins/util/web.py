@@ -39,7 +39,7 @@ def try_isgd(url):
         out = url
     return out
 
-def haste(text, ext='txt'):
+def haste(text, ext='txt', paste_url=paste_url):
     """ pastes text to a hastebin server """
     page = http.get(paste_url + "/documents", post_data=text)
     data = json.loads(page)
