@@ -7,8 +7,8 @@ mc_url = "http://minecraftwiki.net/wiki/"
 
 @hook.command
 def mcwiki(inp):
-    "mcwiki <phrase> -- Gets the first paragraph of" \
-    " the Minecraft Wiki article on <phrase>."
+    """mcwiki <phrase> -- Gets the first paragraph of
+    the Minecraft Wiki article on <phrase>."""
 
     j = http.get_json(api_url, search=inp)
 
@@ -24,6 +24,6 @@ def mcwiki(inp):
             summary = " ".join(p.text_content().splitlines())
             summary = re.sub("\[\d+\]", "", summary)
             summary = text.truncate_str(summary, 200)
-            return "%s :: %s" % (summary, url)
+            return "{} :: {}".format(summary, url)
 
     return "Unknown Error."

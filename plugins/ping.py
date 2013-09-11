@@ -9,7 +9,7 @@ ping_regex = re.compile(r"(\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
 
 @hook.command
 def ping(inp, reply=None):
-    "ping <host> [count] -- Pings <host> [count] times."
+    """ping <host> [count] -- Pings <host> [count] times."""
 
     if os.name == "nt":
         return "Sorry, this command is not supported on Windows systems."
@@ -31,7 +31,7 @@ def ping(inp, reply=None):
     # I assume it's no longer needed with the way we run the process
     # host = re.sub(r'([^\s\w\.])+', '', host)
 
-    reply("Attempting to ping %s %s times..." % (host, count))
+    reply("Attempting to ping {} {} times...".format(host, count))
 
     pingcmd = subprocess.check_output(["ping", "-c", count, host])
     if "request timed out" in pingcmd or "unknown host" in pingcmd:
@@ -39,4 +39,4 @@ def ping(inp, reply=None):
     else:
         m = re.search(ping_regex, pingcmd)
         return "min: %sms, max: %sms, average: %sms, range: %sms, count: %s" \
-        % (m.group(1), m.group(3), m.group(2), m.group(4), count)
+               % (m.group(1), m.group(3), m.group(2), m.group(4), count)

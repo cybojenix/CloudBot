@@ -18,12 +18,12 @@ refresh_cache()
 
 @hook.command(autohelp=False)
 def fml(inp, reply=None):
-    "fml -- Gets a random quote from fmyfife.com."
+    """fml -- Gets a random quote from fmyfife.com."""
 
     # grab the last item in the fml cache and remove it
     id, text = fml_cache.pop()
     # reply with the fml we grabbed
-    reply('(#%d) %s' % (id, text))
+    reply('(#{}) {}'.format(id, text))
     # refresh fml cache if its getting empty
     if len(fml_cache) < 3:
         refresh_cache()

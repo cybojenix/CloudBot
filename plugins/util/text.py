@@ -6,9 +6,38 @@
 
 import re
 
+from HTMLParser import HTMLParser
+import htmlentitydefs
+
+
+class HTMLTextExtractor(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.result = []
+
+    def handle_data(self, d):
+        self.result.append(d)
+
+    def handle_charref(self, number):
+        codepoint = int(number[1:], 16) if number[0] in (u'x', u'X') else int(number)
+        self.result.append(unichr(codepoint))
+
+    def handle_entityref(self, name):
+        codepoint = htmlentitydefs.name2codepoint[name]
+        self.result.append(unichr(codepoint))
+
+    def get_text(self):
+        return u''.join(self.result)
+
+
+def strip_html(html):
+    s = HTMLTextExtractor()
+    s.feed(html)
+    return s.get_text()
+
 
 def munge(text, munge_count=0):
-    "munges up text."
+    """munges up text."""
     reps = 0
     for n in xrange(len(text)):
         rep = character_replacements.get(text[n])
@@ -95,9 +124,27 @@ def multiword_replace(text, wordDic):
     return rc.sub(translate, text)
 
 
+def truncate_words(content, length=10, suffix='...'):
+    """Truncates a string after a certain number of words."""
+    nmsg = content.split(" ")
+    out = None
+    x = 0
+    for i in nmsg:
+        if x <= length:
+            if out:
+                out = out + " " + nmsg[x]
+            else:
+                out = nmsg[x]
+        x += 1
+    if x <= length:
+        return out
+    else:
+        return out + suffix
+
+
 # from <http://stackoverflow.com/questions/250357/smart-truncate-in-python>
 def truncate_str(content, length=100, suffix='...'):
-    "Truncates a string after a certain number of chars."
+    """Truncates a string after a certain number of chars."""
     if len(content) <= length:
         return content
     else:
@@ -179,5 +226,5 @@ def get_text_list(list_, last_word='or'):
         return list_[0]
     return '%s %s %s' % (
         # Translators: This string is used as a separator between list elements
-        (', ').join([i for i in list_][:-1]),
+        ', '.join([i for i in list_][:-1]),
         last_word, list_[-1])

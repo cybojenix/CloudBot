@@ -3,8 +3,8 @@ import json
 
 
 @hook.command(autohelp=False)
-def mcstatus(inp, say=None):
-    "mcstatus -- Checks the status of various Mojang (the creators of Minecraft) servers."
+def mcstatus(inp):
+    """mcstatus -- Checks the status of various Mojang (the creators of Minecraft) servers."""
 
     try:
         request = http.get("http://status.mojang.com/check")
@@ -15,20 +15,30 @@ def mcstatus(inp, say=None):
     data = json.loads(request.replace("}", "").replace("{", "").replace("]", "}").replace("[", "{"))
 
     out = []
+
     # use a loop so we don't have to update it if they add more servers
+    yes = []
+    no = []
     for server, status in data.items():
         if status == "green":
-            out.append("{} is \x033\x02online\x02\x0f".format(server))
+            yes.append(server)
         else:
-            out.append("{} is \x034\x02offline\x02\x0f".format(server))
+            no.append(server)
+    if yes:
+        out = "\x033\x02Online\x02\x0f: " + ", ".join(yes)
+        if no:
+            out += " "
+    if no:
+        out += "\x034\x02Offline\x02\x0f: " + ", ".join(no)
 
-    return "\x0f" + ", ".join(out) + "."
+    return "\x0f" + out.replace(".mojang.com", ".mj") \
+                       .replace(".minecraft.net", ".mc")
 
 
 @hook.command("haspaid")
 @hook.command
 def mcpaid(inp):
-    "mcpaid <username> -- Checks if <username> has a premium Minecraft account."
+    """mcpaid <username> -- Checks if <username> has a premium Minecraft account."""
 
     user = inp.strip()
 

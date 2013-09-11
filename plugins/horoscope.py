@@ -1,12 +1,12 @@
 # Plugin by Infinity - <https://github.com/infinitylabs/UguuBot>
 
-from util import hook, http
+from util import hook, http, text
 
 db_ready = False
 
 
 def db_init(db):
-    "check to see that our db has the horoscope table and return a connection."
+    """check to see that our db has the horoscope table and return a connection."""
     db.execute("create table if not exists horoscope(nick primary key, sign)")
     db.commit()
     db_ready = True
@@ -14,7 +14,7 @@ def db_init(db):
 
 @hook.command(autohelp=False)
 def horoscope(inp, db=None, notice=None, nick=None):
-    "horoscope <sign> -- Get your horoscope."
+    """horoscope <sign> -- Get your horoscope."""
 
     if not db_ready:
         db_init(db)
@@ -42,11 +42,11 @@ def horoscope(inp, db=None, notice=None, nick=None):
     title = soup.find_all('h1', {'class': 'h1b'})[1]
     horoscope = soup.find('div', {'class': 'fontdef1'})
     result = "\x02%s\x02 %s" % (title, horoscope)
-    result = http.strip_html(result)
+    result = text.strip_html(result)
     #result = unicode(result, "utf8").replace('flight ','')
 
     if not title:
-        return "Could not get the horoscope for %s." % inp
+        return "Could not get the horoscope for {}.".format(inp)
 
     if inp and not dontsave:
         db.execute("insert or replace into horoscope(nick, sign) values (?,?)",

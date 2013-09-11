@@ -9,7 +9,7 @@ imdb_re = (r'(.*:)//(imdb.com|www.imdb.com)(:[0-9]+)?(.*)', re.I)
 
 @hook.command
 def imdb(inp):
-    "imdb <movie> -- Gets information about <movie> from IMDb."
+    """imdb <movie> -- Gets information about <movie> from IMDb."""
 
     strip = inp.strip()
 
@@ -21,7 +21,7 @@ def imdb(inp):
     if content.get('Error', None) == 'Movie not found!':
         return 'Movie not found!'
     elif content['Response'] == 'True':
-        content['URL'] = 'http://www.imdb.com/title/%(imdbID)s' % content
+        content['URL'] = 'http://www.imdb.com/title/{}'.format(content['imdbID'])
 
         out = '\x02%(Title)s\x02 (%(Year)s) (%(Genre)s): %(Plot)s'
         if content['Runtime'] != 'N/A':

@@ -3,7 +3,7 @@ from util import hook, http, web
 
 @hook.command(autohelp=False)
 def fact(inp, say=False, nick=False):
-    "fact -- Gets a random fact from OMGFACTS."
+    """fact -- Gets a random fact from OMGFACTS."""
 
     attempts = 0
 
@@ -34,4 +34,4 @@ def fact(inp, say=False, nick=False):
 
     url = web.try_isgd(link)
 
-    return "%s - %s" % (fact, url)
+    return "{} - {}".format(fact, url)

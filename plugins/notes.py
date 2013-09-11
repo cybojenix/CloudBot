@@ -64,8 +64,8 @@ def db_del(db, nick, limit='all'):
           limit ?
           offset ?)
      """, (nick,
-          -1 if limit == 'all' else 1,
-          0 if limit == 'all' else limit))
+           -1 if limit == 'all' else 1,
+           0 if limit == 'all' else limit))
     db.commit()
     return row
 
@@ -88,9 +88,10 @@ def db_search(db, nick, query):
     """, (query, nick))
 
 
+@hook.command("notes")
 @hook.command
-def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
-    "todo (add|del|list|search) args -- Manipulates your list of todos."
+def note(inp, nick='', chan='', db=None, notice=None, bot=None):
+    "note(s) <add|del|list|search> args -- Manipulates your list of notes."
 
     db_init(db)
 
@@ -100,7 +101,7 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
     args = parts[1:]
 
     # code to allow users to access each others factoids and a copy of help
-    # ".todo (add|del|list|search) [@user] args -- Manipulates your list of todos."
+    # ".note (add|del|list|search) [@user] args -- Manipulates your list of todos."
     #if len(args) and args[0].startswith("@"):
     #    nick = args[0][1:]
     #    args = args[1:]
@@ -113,7 +114,7 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
 
         db_add(db, nick, text)
 
-        notice("Task added!")
+        notice("Note added!")
         return
     elif cmd == 'get':
         if len(args):
@@ -130,7 +131,7 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
         if not row:
             notice("No such entry.")
             return
-        notice("[%d]: %s: %s" % (index, row[0], row[1]))
+        notice("[{}]: {}: {}".format(index, row[0], row[1]))
     elif cmd == 'del' or cmd == 'delete' or cmd == 'remove':
         if not len(args):
             return "error"
@@ -146,7 +147,7 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
 
         rows = db_del(db, nick, index)
 
-        notice("Deleted %d entries" % rows.rowcount)
+        notice("Deleted {} entries".format(rows.rowcount))
     elif cmd == 'list':
         limit = -1
 
@@ -163,11 +164,11 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
         found = False
 
         for (index, row) in enumerate(rows):
-            notice("[%d]: %s: %s" % (index, row[0], row[1]))
+            notice("[{}]: {}: {}".format(index, row[0], row[1]))
             found = True
 
         if not found:
-            notice("%s has no entries." % nick)
+            notice("{} has no entries.".format(nick))
     elif cmd == 'search':
         if not len(args):
             notice("No search query given!")
@@ -178,11 +179,11 @@ def todo(inp, nick='', chan='', db=None, notice=None, bot=None):
         found = False
 
         for (index, row) in enumerate(rows):
-            notice("[%d]: %s: %s" % (index, row[0], row[1]))
+            notice("[{}]: {}: {}".format(index, row[0], row[1]))
             found = True
 
         if not found:
-            notice("%s has no matching entries for: %s" % (nick, query))
+            notice("{} has no matching entries for: {}".format(nick, query))
 
     else:
-        notice("Unknown command: %s" % cmd)
+        notice("Unknown command: {}".format(cmd))

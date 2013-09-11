@@ -1,14 +1,15 @@
 # Plugin by Infinity - <https://github.com/infinitylabs/UguuBot>
 
-from util import hook, http
 import random
+from util import hook, http
+
 
 mlia_cache = []
 
 
 def refresh_cache():
-    "gets a page of random MLIAs and puts them into a dictionary "
-    url = 'http://mylifeisaverage.com/%s' % random.randint(1, 11000)
+    """gets a page of random MLIAs and puts them into a dictionary """
+    url = 'http://mylifeisaverage.com/{}'.format(random.randint(1, 11000))
     soup = http.get_soup(url)
 
     for story in soup.find_all('div', {'class': 'story '}):
@@ -26,7 +27,7 @@ def mlia(inp, reply=None):
     # grab the last item in the mlia cache and remove it
     id, text = mlia_cache.pop()
     # reply with the mlia we grabbed
-    reply('(%s) %s' % (id, text))
+    reply('({}) {}'.format(id, text))
     # refresh mlia cache if its getting empty
     if len(mlia_cache) < 3:
         refresh_cache()

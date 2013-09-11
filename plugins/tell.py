@@ -1,5 +1,5 @@
-" tell.py: written by sklnd in July 2009"
-"       2010.01.25 - modified by Scaevolus"
+""" tell.py: written by sklnd in July 2009
+       2010.01.25 - modified by Scaevolus"""
 
 import time
 import re
@@ -8,10 +8,10 @@ from util import hook, timesince
 
 
 def db_init(db):
-    "check to see that our db has the tell table and return a dbection."
+    """check to see that our db has the tell table and return a dbection."""
     db.execute("create table if not exists tell"
-                "(user_to, user_from, message, chan, time,"
-                "primary key(user_to, message))")
+               "(user_to, user_from, message, chan, time,"
+               "primary key(user_to, message))")
     db.commit()
 
     return db
@@ -19,8 +19,8 @@ def db_init(db):
 
 def get_tells(db, user_to):
     return db.execute("select user_from, message, time, chan from tell where"
-                         " user_to=lower(?) order by time",
-                         (user_to.lower(),)).fetchall()
+                      " user_to=lower(?) order by time",
+                      (user_to.lower(),)).fetchall()
 
 
 @hook.singlethread
@@ -37,13 +37,13 @@ def tellinput(paraml, input=None, notice=None, db=None, bot=None, nick=None, con
         user_from, message, time, chan = tells[0]
         reltime = timesince.timesince(time)
 
-        reply = "%s sent you a message %s ago from %s: %s" % (user_from, reltime, chan,
-                                              message)
+        reply = "{} sent you a message {} ago from {}: {}".format(user_from, reltime, chan,
+                                                              message)
         if len(tells) > 1:
-            reply += " (+%d more, %sshowtells to view)" % (len(tells) - 1, conn.conf["command_prefix"])
+            reply += " (+{} more, {}showtells to view)".format(len(tells) - 1, conn.conf["command_prefix"])
 
         db.execute("delete from tell where user_to=lower(?) and message=?",
-                     (nick, message))
+                   (nick, message))
         db.commit()
         notice(reply)
 
@@ -63,16 +63,16 @@ def showtells(inp, nick='', chan='', notice=None, db=None):
     for tell in tells:
         user_from, message, time, chan = tell
         past = timesince.timesince(time)
-        notice("%s sent you a message %s ago from %s: %s" % (user_from, past, chan, message))
+        notice("{} sent you a message {} ago from {}: {}".format(user_from, past, chan, message))
 
     db.execute("delete from tell where user_to=lower(?)",
-                  (nick,))
+               (nick,))
     db.commit()
 
 
 @hook.command
 def tell(inp, nick='', chan='', db=None, input=None, notice=None):
-    "tell <nick> <message> -- Relay <message> to <nick> when <nick> is around."
+    """tell <nick> <message> -- Relay <message> to <nick> when <nick> is around."""
     query = inp.split(' ', 1)
 
     if len(query) != 2:
@@ -92,24 +92,24 @@ def tell(inp, nick='', chan='', db=None, input=None, notice=None):
 
     if user_to.lower() == input.conn.nick.lower():
         # user is looking for us, being a smartass
-        notice("Thanks for the message, %s!" % user_from)
+        notice("Thanks for the message, {}!".format(user_from))
         return
 
-    if not re.match("^[A-Za-z0-9_|.-\]\[]*$", user_to.lower()):
+    if not re.match("^[A-Za-z0-9_|.\-\]\[]*$", user_to.lower()):
         notice("I cant send a message to that user!")
         return
 
     db_init(db)
 
     if db.execute("select count() from tell where user_to=?",
-                    (user_to,)).fetchone()[0] >= 10:
+                  (user_to,)).fetchone()[0] >= 10:
         notice("That person has too many messages queued.")
         return
 
     try:
         db.execute("insert into tell(user_to, user_from, message, chan,"
-                     "time) values(?,?,?,?,?)", (user_to, user_from, message,
-                     chan, time.time()))
+                   "time) values(?,?,?,?,?)", (user_to, user_from, message,
+                                               chan, time.time()))
         db.commit()
     except db.IntegrityError:
         notice("Message has already been queued.")

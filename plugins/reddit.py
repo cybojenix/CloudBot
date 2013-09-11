@@ -3,9 +3,9 @@ import re
 
 reddit_re = (r'.*((www\.)?reddit\.com/r[^ ]+)', re.I)
 
+
 @hook.regex(*reddit_re)
 def reddit_url(match):
-
     thread = http.get_html(match.group(0))
 
     title = thread.xpath('//title/text()')[0]
@@ -15,5 +15,5 @@ def reddit_url(match):
     timeago = thread.xpath("//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
     comments = thread.xpath("//div[@id='siteTable']//a[@class='comments']/text()")[0]
 
-    return '\x02%s\x02 - posted by \x02%s\x02 %s ago - %s upvotes, %s downvotes - %s' % (
-            title, author, timeago, upvotes, downvotes, comments)
+    return '\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
+        title, author, timeago, upvotes, downvotes, comments)

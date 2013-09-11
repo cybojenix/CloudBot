@@ -1,4 +1,5 @@
-from util import hook, http
+from util import hook, http, text
+import re
 
 api_url = "http://encyclopediadramatica.se/api.php?action=opensearch"
 ed_url = "http://encyclopediadramatica.se/"
@@ -6,10 +7,11 @@ ed_url = "http://encyclopediadramatica.se/"
 
 @hook.command
 def drama(inp):
-    "drama <phrase> -- Gets the first paragraph of" \
-    " the Encyclopedia Dramatica article on <phrase>."
+    """drama <phrase> -- Gets the first paragraph of
+    the Encyclopedia Dramatica article on <phrase>."""
 
     j = http.get_json(api_url, search=inp)
+
     if not j[1]:
         return "No results found."
     article_name = j[1][0].replace(' ', '_').encode('utf8')
@@ -20,8 +22,8 @@ def drama(inp):
     for p in page.xpath('//div[@id="bodyContent"]/p'):
         if p.text_content():
             summary = " ".join(p.text_content().splitlines())
-            if len(summary) > 300:
-                summary = summary[:summary.rfind(' ', 0, 300)] + "..."
-            return "%s :: \x02%s\x02" % (summary, url)
+            summary = re.sub("\[\d+\]", "", summary)
+            summary = text.truncate_str(summary, 220)
+            return "{} :: {}".format(summary, url)
 
     return "Unknown Error."

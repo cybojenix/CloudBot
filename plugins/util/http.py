@@ -11,9 +11,6 @@ from urllib import quote, quote_plus as _quote_plus
 from lxml import etree, html
 from bs4 import BeautifulSoup
 
-from HTMLParser import HTMLParser
-import htmlentitydefs
-
 # used in plugins that import this
 from urllib2 import URLError, HTTPError
 
@@ -22,32 +19,12 @@ ua_cloudbot = 'Cloudbot/DEV http://github.com/CloudDev/CloudBot'
 ua_firefox = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/17.0' \
              ' Firefox/17.0'
 ua_old_firefox = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; ' \
-    'rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6'
+                 'rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6'
 ua_internetexplorer = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 ua_chrome = 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.4 (KHTML, ' \
             'like Gecko) Chrome/22.0.1229.79 Safari/537.4'
 
 jar = cookielib.CookieJar()
-
-
-class HTMLTextExtractor(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.result = [ ]
-
-    def handle_data(self, d):
-        self.result.append(d)
-
-    def handle_charref(self, number):
-        codepoint = int(number[1:], 16) if number[0] in (u'x', u'X') else int(number)
-        self.result.append(unichr(codepoint))
-
-    def handle_entityref(self, name):
-        codepoint = htmlentitydefs.name2codepoint[name]
-        self.result.append(unichr(codepoint))
-
-    def get_text(self):
-        return u''.join(self.result)
 
 
 def get(*args, **kwargs):
@@ -75,8 +52,7 @@ def get_json(*args, **kwargs):
 
 
 def open(url, query_params=None, user_agent=None, post_data=None,
-         referer=None, get_method=None, cookies=False, **kwargs):
-
+         referer=None, get_method=None, cookies=False, timeout=None, **kwargs):
     if query_params is None:
         query_params = {}
 
@@ -102,7 +78,10 @@ def open(url, query_params=None, user_agent=None, post_data=None,
     else:
         opener = urllib2.build_opener()
 
-    return opener.open(request)
+    if timeout:
+        return opener.open(request, timeout=timeout)
+    else:
+        return opener.open(request)
 
 
 def prepare_url(url, queries):
@@ -112,7 +91,7 @@ def prepare_url(url, queries):
         query = dict(urlparse.parse_qsl(query))
         query.update(queries)
         query = urllib.urlencode(dict((to_utf8(key), to_utf8(value))
-                                  for key, value in query.iteritems()))
+                                      for key, value in query.iteritems()))
 
         url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
@@ -134,9 +113,3 @@ def unescape(s):
     if not s.strip():
         return s
     return html.fromstring(s).text_content()
-
-
-def strip_html(html):
-    s = HTMLTextExtractor()
-    s.feed(html)
-    return s.get_text()
