@@ -50,7 +50,6 @@ def google(inp):
 
     title = u'{}'.format(title).encode('utf-8')
     content = u'{}'.format(content).encode('utf-8')
-    print "content = " + content + " title = " + title
     out = '{} -- \x02{}\x02: "{}"'.format(result['unescapedUrl'], title, content).decode('utf-8')
 
     return out
