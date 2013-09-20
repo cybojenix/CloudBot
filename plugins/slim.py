@@ -102,8 +102,8 @@ def slimsearch(inp, notice=None, say=None):
 
 @hook.command
 def slimdetect(inp, conn=None, chan=None):
-    global slimuser
     global slimchannel
+    global slimuser
     inp = inp.split(" ")
     slimuser = inp[0]
     slimchannel = chan
@@ -113,8 +113,16 @@ def slimdetect(inp, conn=None, chan=None):
 
 @hook.event("NOTICE")
 def ctcp_capture(inp, conn=None, input=None):
-        print input.msg
-        if "VERSION" in input.msg:
-            message = slimuser + "-" + input.msg.replace('\x01', '')
-            out = "PRIVMSG %s :%s" % (slimchannel, message)
-            conn.send(out)
+        global slimchannel
+        global slimuser
+        if "VERSION" in input.msg and "Android IRC" in input.msg:
+            if  slimchannel \
+              and input.nick == slimuser and slimuser:
+                message = re.sub("(.*on )|( \(.*\))","",input.msg)
+                message = input.nick + " - " + message.replace('\x01', '')
+                out = "PRIVMSG %s :%s" % (slimchannel, message)
+                slimchannel = None
+                slimuser = None
+                conn.send(out)
+            else:
+                input.reply("fuck you %s trying to go through the ctcp capture" % input.nick)
