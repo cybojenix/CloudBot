@@ -1,121 +1,81 @@
-# from jessi bot
-import urllib2
-import hashlib
-import re
-import unicodedata
+from urllib import urlencode
+from urllib2 import urlopen
+import md5
 from util import hook
 
-# these are just parts required
-# TODO: Merge them.
-
-arglist = ['', 'y', '', '', '', '', '', '', '', '', 'wsf', '',
-           '', '', '', '', '', '', '', '0', 'Say', '1', 'false']
-
-always_safe = ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-               'abcdefghijklmnopqrstuvwxyz'
-               '0123456789' '_.-')
-
-headers = {'X-Moz': 'prefetch', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1)Gecko/20100101 Firefox/7.0',
-           'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7', 'Referer': 'http://www.cleverbot.com',
-           'Pragma': 'no-cache', 'Cache-Control': 'no-cache, no-cache', 'Accept-Language': 'en-us;q=0.8,en;q=0.5'}
-
-keylist = ['stimulus', 'start', 'sessionid', 'vText8', 'vText7', 'vText6',
-           'vText5', 'vText4', 'vText3', 'vText2', 'icognoid',
-           'icognocheck', 'prevref', 'emotionaloutput', 'emotionalhistory',
-           'asbotname', 'ttsvoice', 'typing', 'lineref', 'fno', 'sub',
-           'islearning', 'cleanslate']
-
-MsgList = list()
-
-
-def quote(s, safe='/'):  # quote('abc def') -> 'abc%20def'
-    s = s.encode('utf-8')
-    s = s.decode('utf-8')
-    print "s= " + s
-    print "safe= " + safe
-    safe += always_safe
-    safe_map = dict()
-    for i in range(256):
-        c = chr(i)
-        safe_map[c] = (c in safe) and c or ('%%%02X' % i)
-    try:
-        res = map(safe_map.__getitem__, s)
-    except:
-        print "blank"
+def _utils_string_at_index(strings, index):
+    if len(strings) > index:
+        return strings[index]
+    else:
         return ''
-    print "res= " + ''.join(res)
-    return ''.join(res)
+    
+cb_url = 'http://www.cleverbot.com/webservicemin'
 
-
-def encode(keylist, arglist):
-    text = str()
-    for i in range(len(keylist)):
-        k = keylist[i]
-        v = quote(arglist[i])
-        text += '&' + k + '=' + v
-    text = text[1:]
-    return text
-
-
-def Send():
-    data = encode(keylist, arglist)
-    digest_txt = data[9:29]
-    new_hash = hashlib.md5(digest_txt).hexdigest()
-    arglist[keylist.index('icognocheck')] = new_hash
-    data = encode(keylist, arglist)
-    req = urllib2.Request('http://www.cleverbot.com/webservicemin',
-                          data, headers)
-    f = urllib2.urlopen(req)
-    reply = f.read()
-    return reply
-
-
-def parseAnswers(text):
-    d = dict()
-    keys = ['text', 'sessionid', 'logurl', 'vText8', 'vText7', 'vText6',
-            'vText5', 'vText4', 'vText3', 'vText2', 'prevref', 'foo',
-            'emotionalhistory', 'ttsLocMP3', 'ttsLocTXT', 'ttsLocTXT3',
-            'ttsText', 'lineRef', 'lineURL', 'linePOST', 'lineChoices',
-            'lineChoicesAbbrev', 'typingData', 'divert']
-    values = text.split('\r')
-    i = 0
-    for key in keys:
-        d[key] = values[i]
-        i += 1
-    return d
-
-
-def ask(inp):
-    arglist[keylist.index('stimulus')] = inp
-    if MsgList:
-        arglist[keylist.index('lineref')] = '!0' + str(len(
-            MsgList) / 2)
-    asw = Send()
-    MsgList.append(inp)
-    answer = parseAnswers(asw)
-    for k, v in answer.iteritems():
-        try:
-            arglist[keylist.index(k)] = v
-        except ValueError:
-            pass
-    arglist[keylist.index('emotionaloutput')] = str()
-    text = answer['ttsText']
-    MsgList.append(text)
-    return text
-
-
+class CleverBot(object):
+    def __init__(self, url=cb_url, end_index=35):
+        self.url = url
+        self.end_index = end_index
+        self.vars = {}
+        self.vars['start'] = 'y'
+        self.vars['icognoid'] = 'wsf'
+        self.vars['fno'] = '0'
+        self.vars['sub'] = 'Say'
+        self.vars['islearning'] = '1'
+        self.vars['cleanslate'] = 'false'
+        
+    def digester(self):
+        self.vars['stimulus'] = self.thought
+        data = urlencode(self.vars)
+        data_to_digest = data[9:self.end_index]
+        data_digest = md5.new(data_to_digest).hexdigest()
+        self.data = data + '&icognocheck=' + data_digest
+        
+    def get_response(self):
+        url_response = urlopen(self.url, self.data).read()
+        self.response_values = url_response.split('\r')
+        
+    def get_vars(self):
+        #self.vars['??'] = _utils_string_at_index(self.response_values, 0)
+        self.vars['sessionid'] = _utils_string_at_index(self.response_values, 1)
+        self.vars['logurl'] = _utils_string_at_index(self.response_values, 2)
+        self.vars['vText8'] = _utils_string_at_index(self.response_values, 3)
+        self.vars['vText7'] = _utils_string_at_index(self.response_values, 4)
+        self.vars['vText6'] = _utils_string_at_index(self.response_values, 5)
+        self.vars['vText5'] = _utils_string_at_index(self.response_values, 6)
+        self.vars['vText4'] = _utils_string_at_index(self.response_values, 7)
+        self.vars['vText3'] = _utils_string_at_index(self.response_values, 8)
+        self.vars['vText2'] = _utils_string_at_index(self.response_values, 9)
+        self.vars['prevref'] = _utils_string_at_index(self.response_values, 10)
+        #self.vars['??'] = _utils_string_at_index(self.response_values, 11)
+        self.vars['emotionalhistory'] = _utils_string_at_index(self.response_values, 12)
+        self.vars['ttsLocMP3'] = _utils_string_at_index(self.response_values, 13)
+        self.vars['ttsLocTXT'] = _utils_string_at_index(self.response_values, 14)
+        self.vars['ttsLocTXT3'] = _utils_string_at_index(self.response_values, 15)
+        self.vars['ttsText'] = _utils_string_at_index(self.response_values, 16)
+        self.vars['lineRef'] = _utils_string_at_index(self.response_values, 17)
+        self.vars['lineURL'] = _utils_string_at_index(self.response_values, 18)
+        self.vars['linePOST'] = _utils_string_at_index(self.response_values, 19)
+        self.vars['lineChoices'] = _utils_string_at_index(self.response_values, 20)
+        self.vars['lineChoicesAbbrev'] = _utils_string_at_index(self.response_values, 21)
+        self.vars['typingData'] = _utils_string_at_index(self.response_values, 22)
+        self.vars['divert'] = _utils_string_at_index(self.response_values, 23)
+        
+        self.reply = self.vars['ttsText']
+        
+    def get_reply(self, thought):
+        self.thought = thought
+        self.digester()
+        self.get_response()
+        self.get_vars()
+        
+        return self.reply
+    
 @hook.command("cb")
 def cleverbot(inp, reply=None):
-    reply(ask(inp))
-
-
-''' # TODO: add in command to control extra verbose per channel
-@hook.event('PRIVMSG')
-def cbevent(inp, reply=None):
-    reply(ask(inp))
-
-@hook.command("cbver", permissions=['cleverbot'])
-def cleverbotverbose(inp, notice=None):
-    if on in input
-'''
+    cb = CleverBot()
+    message = cb.get_reply(inp)
+    reply(message)
+    
+if __name__ == '__main__':
+    cleverbot = CleverBot()
+    print cleverbot.think_thought("hello")
