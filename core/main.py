@@ -13,29 +13,34 @@ class Input(dict):
         if chan == conn.nick.lower():  # is a PM
             chan = nick
 
-        def say(msg, chan=chan):
-            conn.msg(chan, msg)
+        def message(message, target=chan):
+            """sends a message to a specific or current channel/user"""
+            conn.msg(target, message)
 
-        def pm(msg, nick=nick):
-            conn.msg(nick, msg)
-
-        def reply(msg, chan=chan):
-            if chan == nick:  # PMs don't need prefixes
-                conn.msg(chan, msg)
+        def reply(message, target=chan):
+            """sends a message to the current channel/user with a prefix"""
+            if target == nick:
+                conn.msg(target, message)
             else:
-                conn.msg(chan, '(' + nick + ') ' + msg)
+                conn.msg(target, "({}) {}".format(nick, message))
 
-        def me(msg, chan=chan):
-            conn.msg(chan, "\x01{} {}\x01".format("ACTION", msg))
+        def action(message, target=chan):
+            """sends an action to the current channel/user or a specific channel/user"""
+            conn.ctcp(target, "ACTION", message)
 
-        def notice(msg, nick=nick):
-            conn.cmd('NOTICE', [nick, msg])
+        def ctcp(message, ctcp_type, target=chan):
+            """sends an ctcp to the current channel/user or a specific channel/user"""
+            conn.ctcp(target, ctcp_type, message)
+
+        def notice(message, target=user):
+            """sends a notice to the current channel/user or a specific channel/user"""
+            conn.cmd('NOTICE', [target, message])
 
         dict.__init__(self, conn=conn, raw=raw, prefix=prefix, command=command,
                       params=params, nick=nick, user=user, host=host, mask=mask,
                       paraml=paraml, msg=msg, server=conn.server, chan=chan,
-                      notice=notice, say=say, reply=reply, pm=pm, bot=bot,
-                      me=me, lastparam=paraml[-1])
+                      notice=notice, message=message, reply=reply, bot=bot,
+                      action=action, ctcp=ctcp, lastparam=paraml[-1])
 
     # make dict keys accessible as attributes
     def __getattr__(self, key):

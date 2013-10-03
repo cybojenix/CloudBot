@@ -47,9 +47,4 @@ def google(inp):
     else:
         content = http.html.fromstring(content).text_content()
         content = text.truncate_str(content, 150)
-
-    title = u'{}'.format(title).encode('utf-8')
-    content = u'{}'.format(content).encode('utf-8')
-    out = '{} -- \x02{}\x02: "{}"'.format(result['unescapedUrl'], title, content).decode('utf-8')
-
-    return out
+    return u'{} -- \x02{}\x02: "{}"'.format(result['unescapedUrl'], title, content)

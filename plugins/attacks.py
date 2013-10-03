@@ -5,10 +5,6 @@ with open("plugins/data/larts.txt") as f:
     larts = [line.strip() for line in f.readlines()
              if not line.startswith("//")]
 
-with open("plugins/data/kills.txt") as f:
-    kills = [line.strip() for line in f.readlines()
-             if not line.startswith("//")]
-
 with open("plugins/data/insults.txt") as f:
     insults = [line.strip() for line in f.readlines()
                if not line.startswith("//")]
@@ -18,7 +14,7 @@ with open("plugins/data/flirts.txt") as f:
               if not line.startswith("//")]
 
 @hook.command
-def lart(inp, me=None, nick=None, conn=None, notice=None):
+def lart(inp, action=None, nick=None, conn=None, notice=None):
     """lart <user> -- LARTs <user>."""
     target = inp.strip()
 
@@ -34,31 +30,11 @@ def lart(inp, me=None, nick=None, conn=None, notice=None):
     phrase = random.choice(larts)
 
     # act out the message
-    me(phrase.format(**values))
+    action(phrase.format(**values))
 
 
 @hook.command
-def kill(inp, me=None, nick=None, conn=None, notice=None):
-    """kill <user> -- Makes the bot kill <user>."""
-    target = inp.strip()
-
-    if " " in target:
-        notice("Invalid username!")
-        return
-
-    # if the user is trying to make the bot slap itself, slap them
-    if target.lower() == conn.nick.lower() or target.lower() == "itself":
-        target = nick
-
-    values = {"user": target}
-    phrase = random.choice(kills)
-
-    # act out the message
-    me(phrase.format(**values))
-
-
-@hook.command
-def insult(inp, nick=None, me=None, conn=None, notice=None):
+def insult(inp, nick=None, action=None, conn=None, notice=None):
     """insult <user> -- Makes the bot insult <user>."""
     target = inp.strip()
 
@@ -72,11 +48,11 @@ def insult(inp, nick=None, me=None, conn=None, notice=None):
         target = inp
 
     out = 'insults {}... "{}"'.format(target, random.choice(insults))
-    me(out)
+    action(out)
 
 
 @hook.command
-def flirt(inp, me=None, conn=None, notice=None):
+def flirt(inp, action=None, conn=None, notice=None):
     """flirt <user> -- Make the bot flirt with <user>."""
     target = inp.strip()
 
@@ -90,4 +66,4 @@ def flirt(inp, me=None, conn=None, notice=None):
         target = inp
 
     out = 'flirts with {}... "{}"'.format(target, random.choice(flirts))
-    me(out)
+    action(out)
