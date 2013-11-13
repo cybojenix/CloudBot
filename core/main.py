@@ -34,6 +34,8 @@ class Input(dict):
 
         def notice(message, target=user):
             """sends a notice to the current channel/user or a specific channel/user"""
+            if target.startswith("~"):
+                target = target[1:]
             conn.cmd('NOTICE', [target, message])
 
         dict.__init__(self, conn=conn, raw=raw, prefix=prefix, command=command,
