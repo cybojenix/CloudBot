@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from util import hook
 import re, mmap
 
+'''
 @hook.singlethread
 @hook.event('*')
 def slimtest(inp, conn=None):
@@ -99,7 +100,7 @@ def slimsearch(inp, notice=None, say=None):
 	else:
 		message = search + ": " + output_url
 		say(message)
-
+'''
 @hook.command
 def slimdetect(inp, conn=None, chan=None):
     global slimchannel

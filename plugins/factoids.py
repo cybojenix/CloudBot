@@ -132,7 +132,11 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
             variables = 'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}";'.format(arguments.replace('"', '\\"'),
                                                                                   input.nick, input.chan,
                                                                                   input.conn.nick)
-            result = execute.eval_py(variables + code)
+            if code.startswith("<force>"):
+                code = code[8:].strip()
+                result = execute.eval_py(variables + code, paste_multiline=False)
+            else:
+                result = execute.eval_py(variables + code)
         else:
             result = data
 
@@ -149,7 +153,15 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
             except http.HttpError:
                 message("Could not fetch URL.")
         else:
-            if prefix_on:
-                message("\x02[{}]:\x02 {}".format(factoid_id, result))
+            if "\n" in result:
+                result = result.strip("\r").split("\n")
+                for output in result:
+                    if prefix_on:
+                        message("\x02[{}]:\x02 {}".format(factoid_id, output))
+                    else:
+                        message(output)
             else:
-                message(result)
+                if prefix_on:
+                    message("\x02[{}]:\x02 {}".format(factoid_id, result))
+                else:
+                    message(result)

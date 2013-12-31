@@ -34,7 +34,7 @@ def lart(inp, action=None, nick=None, conn=None, notice=None):
 
 
 @hook.command
-def insult(inp, nick=None, action=None, conn=None, notice=None):
+def insult(inp, nick=None, message=None, conn=None, notice=None):
     """insult <user> -- Makes the bot insult <user>."""
     target = inp.strip()
 
@@ -47,12 +47,12 @@ def insult(inp, nick=None, action=None, conn=None, notice=None):
     else:
         target = inp
 
-    out = 'insults {}... "{}"'.format(target, random.choice(insults))
-    action(out)
+    out = 'Yo {}... "{}"'.format(target, random.choice(insults))
+    message(out)
 
 
 @hook.command
-def flirt(inp, action=None, conn=None, notice=None):
+def flirt(inp, message=None, conn=None, notice=None):
     """flirt <user> -- Make the bot flirt with <user>."""
     target = inp.strip()
 
@@ -65,5 +65,5 @@ def flirt(inp, action=None, conn=None, notice=None):
     else:
         target = inp
 
-    out = 'flirts with {}... "{}"'.format(target, random.choice(flirts))
-    action(out)
+    out = 'hey {}... "{}"'.format(target, random.choice(flirts))
+    message(out)

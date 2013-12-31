@@ -12,3 +12,5 @@ gitflow
 *.sublime-workspace
 .idea/
 plugins/data/GeoLiteCity.dat
+plugins/data/*grouper*
+plugins/data/ota*
