@@ -1,18 +1,20 @@
-from util import hook
-from Crypto import Random
-from Crypto.Cipher import AES
-from Crypto.Protocol.KDF import PBKDF2
-
 import os
 import base64
 import json
 import hashlib
 
+from Crypto import Random
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
+
+from util import hook
+
+
 # helper functions to pad and unpad a string to a specified block size
-# <http://stackoverflow.com/questions/12524994/encrypt-decrypt-using-pycrypto-aes-256> 
+# <http://stackoverflow.com/questions/12524994/encrypt-decrypt-using-pycrypto-aes-256>
 BS = AES.block_size
-pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
-unpad = lambda s : s[0:-ord(s[-1])]
+pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+unpad = lambda s: s[0:-ord(s[-1])]
 
 # helper functions to encrypt and encode a string with AES and base64
 encode_aes = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
@@ -23,10 +25,12 @@ db_ready = False
 
 def db_init(db):
     """check to see that our db has the the encryption table."""
-    db.execute("create table if not exists encryption(encrypted, iv, "
-               "primary key(encrypted))")
-    db.commit()
-    db_ready = True
+    global db_ready
+    if not db_ready:
+        db.execute("create table if not exists encryption(encrypted, iv, "
+                   "primary key(encrypted))")
+        db.commit()
+        db_ready = True
 
 
 def get_salt(bot):
@@ -40,15 +44,14 @@ def get_salt(bot):
 @hook.command
 def encrypt(inp, bot=None, db=None, notice=None):
     """encrypt <pass> <string> -- Encrypts <string> with <pass>. (<string> can only be decrypted using this bot)"""
-    if not db_ready:
-        db_init(db)
+    db_init(db)
 
     split = inp.split(" ")
 
     # if there is only one argument, return the help message
     if len(split) == 1:
         notice(encrypt.__doc__)
-        return 
+        return
 
     # generate the key from the password and salt
     password = split[0]
@@ -56,7 +59,7 @@ def encrypt(inp, bot=None, db=None, notice=None):
     key = PBKDF2(password, salt)
 
     # generate the IV and encode it to store in the database
-    iv = Random.new().read(AES.block_size);
+    iv = Random.new().read(AES.block_size)
     iv_encoded = base64.b64encode(iv)
 
     # create the AES cipher and encrypt/encode the text with it
@@ -83,9 +86,9 @@ def decrypt(inp, bot=None, db=None, notice=None):
     # if there is only one argument, return the help message
     if len(split) == 1:
         notice(decrypt.__doc__)
-        return 
+        return
 
-    # generate the key from the password and salt	
+    # generate the key from the password and salt
     password = split[0]
     salt = get_salt(bot)
     key = PBKDF2(password, salt)
@@ -94,7 +97,7 @@ def decrypt(inp, bot=None, db=None, notice=None):
 
     # get the encoded IV from the database and decode it
     iv_encoded = db.execute("select iv from encryption where"
-                           " encrypted=?", (text,)).fetchone()[0]
+                            " encrypted=?", (text,)).fetchone()[0]
     iv = base64.b64decode(iv_encoded)
 
     # create AES cipher, decode text, decrypt text, and unpad it

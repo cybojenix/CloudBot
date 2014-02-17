@@ -1,9 +1,13 @@
 # Written by Scaevolus 2010
-from util import hook, http, text, execute
 import string
 import re
 
+from util import hook, http, text, pyexec
+
+
 re_lineends = re.compile(r'[\r\n]*')
+
+db_ready = False
 
 # some simple "shortcodes" for formatting purposes
 shortcodes = {
@@ -16,9 +20,12 @@ shortcodes = {
 
 
 def db_init(db):
-    db.execute("create table if not exists mem(word, data, nick,"
-               " primary key(word))")
-    db.commit()
+    global db_ready
+    if not db_ready:
+        db.execute("create table if not exists mem(word, data, nick,"
+                   " primary key(word))")
+        db.commit()
+        db_ready = True
 
 
 def get_memory(db, word):
@@ -106,7 +113,7 @@ def info(inp, notice=None, db=None):
 
 @hook.regex(r'^\? ?(.+)')
 def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=None):
-    "?<word> -- Shows what data is associated with <word>."
+    """?<word> -- Shows what data is associated with <word>."""
     try:
         prefix_on = bot.config["plugins"]["factoids"].get("prefix", False)
     except KeyError:
@@ -134,9 +141,9 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
                                                                                   input.conn.nick)
             if code.startswith("<force>"):
                 code = code[8:].strip()
-                result = execute.eval_py(variables + code, paste_multiline=False)
+                result = pyexec.eval_py(variables + code, paste_multiline=False)
             else:
-                result = execute.eval_py(variables + code)
+                result = pyexec.eval_py(variables + code)
         else:
             result = data
 

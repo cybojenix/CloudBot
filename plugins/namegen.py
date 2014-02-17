@@ -1,6 +1,7 @@
-# Plugin by Lukeroge
+import json
+import os
+
 from util import hook, text, textgen
-import json, os
 
 
 GEN_DIR = "./plugins/data/name_files/"
@@ -9,13 +10,13 @@ GEN_DIR = "./plugins/data/name_files/"
 def get_generator(_json):
     data = json.loads(_json)
     return textgen.TextGenerator(data["templates"],
-        data["parts"], default_templates = data["default_templates"])
+                                 data["parts"], default_templates=data["default_templates"])
 
 
 @hook.command(autohelp=False)
 def namegen(inp, notice=None):
-    "namegen [generator] -- Generates some names using the chosen generator. " \
-    "'namegen list' will display a list of all generators."
+    """namegen [generator] -- Generates some names using the chosen generator.
+    'namegen list' will display a list of all generators."""
 
     # clean up the input
     inp = inp.strip().lower()

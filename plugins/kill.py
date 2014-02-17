@@ -1,5 +1,6 @@
-from util import hook, textgen
 import json
+
+from util import hook, textgen
 
 
 def get_generator(_json, variables):
@@ -22,7 +23,7 @@ def kill(inp, action=None, nick=None, conn=None, notice=None):
         target = nick
 
     variables = {
-    	"user": target
+        "user": target
     }
 
     with open("plugins/data/kills.json") as f:

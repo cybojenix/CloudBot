@@ -1,5 +1,9 @@
+oauth2
+pygeoip
+tweepy
 BeautifulSoup==3.2.1
 lxml==3.1beta1
 pyenchant==1.6.5
 pydns>=2.3.6
 BeautifulSoup4
+pycrypto

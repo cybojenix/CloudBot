@@ -1,4 +1,5 @@
 import random
+
 from util import hook, http, text
 
 
@@ -20,8 +21,7 @@ def googleimage(inp):
         raise IOError('error searching for images: {}: {}'.format(parsed['responseStatus'], ''))
     if not parsed['responseData']['results']:
         return 'no images found'
-    return random.choice(parsed['responseData']['results'][:10]) \
-        ['unescapedUrl']
+    return random.choice(parsed['responseData']['results'][:10])['unescapedUrl']
 
 
 @hook.command('search')

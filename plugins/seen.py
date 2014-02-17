@@ -5,15 +5,18 @@ import re
 
 from util import hook, timesince
 
+
 db_ready = False
 
 
 def db_init(db):
     """check to see that our db has the the seen table and return a connection."""
-    db.execute("create table if not exists seen_user(name, time, quote, chan, host, "
-               "primary key(name, chan))")
-    db.commit()
-    db_ready = True
+    global db_ready
+    if not db_ready:
+        db.execute("create table if not exists seen_user(name, time, quote, chan, host, "
+                   "primary key(name, chan))")
+        db.commit()
+        db_ready = True
 
 
 @hook.singlethread
@@ -32,7 +35,7 @@ def seen_sieve(paraml, input=None, db=None):
 @hook.command
 def seen(inp, nick='', chan='', db=None, input=None):
     """seen <nick> <channel> -- Tell when a nickname was last in active in one of this bot's channels."""
-    
+
     if input.conn.nick.lower() == inp.lower():
         return "You need to get your eyes checked."
 

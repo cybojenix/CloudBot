@@ -6,13 +6,17 @@ import re
 
 from util import hook, timesince
 
+db_ready = False
 
 def db_init(db):
     """check to see that our db has the tell table and return a dbection."""
-    db.execute("create table if not exists tell"
-               "(user_to, user_from, message, chan, time,"
-               "primary key(user_to, message))")
-    db.commit()
+    global db_ready
+    if not db_ready:
+        db.execute("create table if not exists tell"
+                   "(user_to, user_from, message, chan, time,"
+                   "primary key(user_to, message))")
+        db.commit()
+        db_ready = True
 
     return db
 
@@ -38,7 +42,7 @@ def tellinput(paraml, input=None, notice=None, db=None, bot=None, nick=None, con
         reltime = timesince.timesince(time)
 
         reply = "{} sent you a message {} ago from {}: {}".format(user_from, reltime, chan,
-                                                              message)
+                                                                  message)
         if len(tells) > 1:
             reply += " (+{} more, {}showtells to view)".format(len(tells) - 1, conn.conf["command_prefix"])
 
@@ -50,7 +54,7 @@ def tellinput(paraml, input=None, notice=None, db=None, bot=None, nick=None, con
 
 @hook.command(autohelp=False)
 def showtells(inp, nick='', chan='', notice=None, db=None):
-    "showtells -- View all pending tell messages (sent in a notice)."
+    """showtells -- View all pending tell messages (sent in a notice)."""
 
     db_init(db)
 
@@ -91,7 +95,7 @@ def tell(inp, nick='', chan='', db=None, input=None, notice=None):
         return
 
     if user_to.lower() == input.conn.nick.lower():
-        # user is looking for us, being a smartass
+        # user is looking for us, being a smart-ass
         notice("Thanks for the message, {}!".format(user_from))
         return
 

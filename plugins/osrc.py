@@ -1,5 +1,7 @@
-from util import hook, http, web
 from bs4 import BeautifulSoup
+
+from util import hook, http, web
+
 
 api_url = "http://osrc.dfm.io/{}/stats"
 user_url = "http://osrc.dfm.io/{}"
@@ -19,7 +21,7 @@ def osrc(inp):
 
     response["nick"] = user_nick
     soup = BeautifulSoup(response["summary"])
-    response["work_time"] = soup.find("a", {"href" : "#day"}).contents[0]
+    response["work_time"] = soup.find("a", {"href": "#day"}).contents[0]
 
     response["short_url"] = web.try_isgd(user_url.format(user_nick))
 

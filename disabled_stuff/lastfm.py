@@ -1,5 +1,7 @@
-from util import hook, http, timesince
 from datetime import datetime
+
+from util import hook, http, timesince
+
 
 api_url = "http://ws.audioscrobbler.com/2.0/?format=json"
 
@@ -75,7 +77,7 @@ def lastfm(inp, nick='', db=None, bot=None, notice=None):
 
     if inp and not dontsave:
         db.execute("insert or replace into lastfm(nick, acc) values (?,?)",
-                     (nick.lower(), user))
+                   (nick.lower(), user))
         db.commit()
 
     return out
