@@ -136,7 +136,7 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
         # factoid preprocessors
         if data.startswith("<py>"):
             code = data[4:].strip()
-            variables = 'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}";'.format(arguments.replace('"', '\\"'),
+            variables = 'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}"; '.format(arguments.replace('"', '\\"'),
                                                                                   input.nick, input.chan,
                                                                                   input.conn.nick)
             if code.startswith("<force>"):

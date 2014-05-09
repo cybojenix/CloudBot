@@ -17,17 +17,18 @@ with open("plugins/data/flirts.txt") as f:
 
 
 @hook.command
-def lart(inp, action=None, nick=None, conn=None, notice=None):
+def lart(inp, action=None, nick=None, conn=None, notice=None, bot=None):
     """lart <user> -- LARTs <user>."""
     target = inp.strip()
 
-    if " " in target:
-        notice("Invalid username!")
-        return
-
     # if the user is trying to make the bot slap itself, slap them
-    if target.lower() == conn.nick.lower() or target.lower() == "itself":
+    if target.lower() == conn.nick.lower() or target.lower() in ["itself", "yourself"]:
         target = nick
+
+    masters = bot.config.get("masters", [])
+    if masters:
+        if target.lower() in masters:
+            target = nick
 
     values = {"user": target}
     phrase = random.choice(larts)
@@ -37,18 +38,17 @@ def lart(inp, action=None, nick=None, conn=None, notice=None):
 
 
 @hook.command
-def insult(inp, nick=None, message=None, conn=None, notice=None):
+def insult(inp, nick=None, message=None, conn=None, notice=None, bot=None):
     """insult <user> -- Makes the bot insult <user>."""
     target = inp.strip()
 
-    if " " in target:
-        notice("Invalid username!")
-        return
-
     if target == conn.nick.lower() or target == "itself":
         target = nick
-    else:
-        target = inp
+
+    masters = bot.config.get("masters", [])
+    if masters:
+        if target.lower() in masters:   
+            target = nick
 
     out = 'Yo {}... "{}"'.format(target, random.choice(insults))
     message(out)
@@ -59,14 +59,8 @@ def flirt(inp, message=None, conn=None, notice=None):
     """flirt <user> -- Make the bot flirt with <user>."""
     target = inp.strip()
 
-    if " " in target:
-        notice("Invalid username!")
-        return
-
-    if target == conn.nick.lower() or target == "itself":
-        target = 'itself'
-    else:
-        target = inp
+    if target == conn.nick.lower():
+        target = 'themself'
 
     out = 'hey {}... "{}"'.format(target, random.choice(flirts))
     message(out)
