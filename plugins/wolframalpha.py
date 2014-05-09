@@ -3,11 +3,12 @@ import re
 from util import hook, http, text, web
 
 
+@hook.command('math')
+@hook.command('calc')
 @hook.command('wa')
 @hook.command
 def wolframalpha(inp, bot=None):
     """wa <query> -- Computes <query> using Wolfram Alpha."""
-
     api_key = bot.config.get("api_keys", {}).get("wolframalpha", None)
 
     if not api_key:
@@ -35,9 +36,9 @@ def wolframalpha(inp, bot=None):
             if subpod:
                 results.append(subpod)
         if results:
-            pod_texts.append(title + ': ' + ', '.join(results))
+            pod_texts.append(title + u': ' + u', '.join(results))
 
-    ret = ' - '.join(pod_texts)
+    ret = u' - '.join(pod_texts)
 
     if not pod_texts:
         return 'No results.'
@@ -54,4 +55,4 @@ def wolframalpha(inp, bot=None):
     if not ret:
         return 'No results.'
 
-    return "{} - {}".format(ret, short_url)
+    return u"{} - {}".format(ret, short_url)

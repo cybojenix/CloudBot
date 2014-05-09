@@ -1,9 +1,11 @@
-from util import hook, http, text, timesince
 from datetime import datetime
 import re
 import random
 
-reddit_re = (r'.*((www\.)?reddit\.com/r[^ ]+)', re.I)
+from util import hook, http, text, timesince
+
+
+reddit_re = (r'.*(((www\.)?reddit\.com/r|redd\.it)[^ ]+)', re.I)
 
 base_url = "http://reddit.com/r/{}/.json"
 short_url = "http://redd.it/{}"
@@ -20,7 +22,7 @@ def reddit_url(match):
     timeago = thread.xpath("//div[@id='siteTable']//p[@class='tagline']/time/text()")[0]
     comments = thread.xpath("//div[@id='siteTable']//a[@class='comments']/text()")[0]
 
-    return '\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
+    return u'\x02{}\x02 - posted by \x02{}\x02 {} ago - {} upvotes, {} downvotes - {}'.format(
         title, author, timeago, upvotes, downvotes, comments)
 
 
@@ -36,14 +38,14 @@ def reddit(inp):
         # find the requested post number (if any)
         if len(parts) > 1:
             url = base_url.format(parts[0].strip())
-            try: 
+            try:
                 id_num = int(parts[1]) - 1
             except ValueError:
                 return "Invalid post number."
         else:
             url = base_url.format(parts[0].strip())
     else:
-        url  = "http://reddit.com/.json"
+        url = "http://reddit.com/.json"
 
     try:
         data = http.get_json(url, user_agent=http.ua_chrome)
@@ -51,9 +53,8 @@ def reddit(inp):
         return "Error: " + str(e)
     data = data["data"]["children"]
 
-
     # get the requested/random post
-    if id_num:
+    if id_num is not None:
         try:
             item = data[id_num]["data"]
         except IndexError:
@@ -65,14 +66,14 @@ def reddit(inp):
     item["title"] = text.truncate_str(item["title"], 50)
     item["link"] = short_url.format(item["id"])
 
-    rawtime = datetime.fromtimestamp(int(item["created_utc"]))
-    item["timesince"] = timesince.timesince(rawtime)
+    raw_time = datetime.fromtimestamp(int(item["created_utc"]))
+    item["timesince"] = timesince.timesince(raw_time)
 
     if item["over_18"]:
         item["warning"] = " \x02NSFW\x02"
     else:
         item["warning"] = ""
 
-    return u'\x02{title} : {subreddit}\x02 - posted by \x02{author}\x02' \
-    ' {timesince} ago - {ups} upvotes, {downs} downvotes -' \
-    ' {link}{warning}'.format(**item)
+    return u"\x02{title} : {subreddit}\x02 - posted by \x02{author}\x02" \
+           " {timesince} ago - {ups} upvotes, {downs} downvotes -" \
+           " {link}{warning}".format(**item)

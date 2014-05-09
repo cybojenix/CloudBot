@@ -1,48 +1,30 @@
-from util import hook, http
-
-import json
-
-url = 'http://www.google.com/ig/api'
+from util import hook, web
 
 
 @hook.command
 def stock(inp):
-    """stock <symbol> -- Gets information about stock symbol <symbol>."""
+    """stock <symbol> -- gets stock information"""
+    sym = inp.strip().lower()
 
-    parsed = http.get_xml(url, stock=inp)
+    query = "SELECT * FROM yahoo.finance.quote WHERE symbol=@symbol LIMIT 1"
+    quote = web.query(query, {"symbol": sym}).one()
 
-    if len(parsed) != 1:
-        return "error getting stock info"
+    # if we don't get a company name back, the symbol doesn't match a company
+    if quote['Change'] is None:
+        return "Unknown ticker symbol: {}".format(sym)
 
-    # Stuff the results in a dict for easy string formatting
-    results = dict((el.tag, el.attrib['data'])
-                   for el in parsed.xpath('//finance/*'))
+    change = float(quote['Change'])
+    price = float(quote['LastTradePriceOnly'])
 
-    # if we dont get a company name back, the symbol doesn't match a company
-    if not "company" in results:
-        guess_data = json.loads(http.get("http://d.yimg.com/autoc.finance.yahoo.com/autoc", query=inp,
-                                         callback="YAHOO.Finance.SymbolSuggest.ssCallback")[39:-1])
-        guess = guess_data['ResultSet']['Result']
-        if len(guess) > 0:
-            guess = guess[0]["symbol"]
-            return stock(guess)
-        else:
-            return "error: unable to get stock info for '{}'".format(inp)
-
-    if results['last'] == '0.00':
-        return "%(company)s - last known stock value was 0.00 %(currency)s" \
-               " as of %(trade_timestamp)s" % results
-
-    if results['change'][0] == '-':
-        results['color'] = "5"
+    if change < 0:
+        quote['color'] = "5"
     else:
-        results['color'] = "3"
+        quote['color'] = "3"
 
-    ret = "%(company)s - %(last)s %(currency)s " \
-          "\x03%(color)s%(change)s (%(perc_change)s%%)\x03 " \
-          "as of %(trade_timestamp)s" % results
+    quote['PercentChange'] = 100 * change / (price - change)
+    print quote
 
-    if results['delay'] != '0':
-        ret += " (delayed %s minutes)" % results['delay']
-
-    return ret
+    return u"\x02{Name}\x02 (\x02{symbol}\x02) - {LastTradePriceOnly} " \
+           "\x03{color}{Change} ({PercentChange:.2f}%)\x03 " \
+           "Day Range: {DaysRange} " \
+           "MCAP: {MarketCapitalization}".format(**quote)

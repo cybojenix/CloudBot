@@ -1,9 +1,11 @@
-from util import hook
-import os, sys
+import os
+import sys
 import re
 import json
 import time
 import subprocess
+
+from util import hook
 
 
 @hook.command(autohelp=False, permissions=["permissions_users"])
@@ -127,6 +129,7 @@ def restart(inp, nick=None, conn=None, bot=None):
     args.insert(0, sys.executable)
     os.execv(sys.executable, args)
 
+
 @hook.command(autohelp=False, permissions=["botcontrol"])
 def clearlogs(inp, input=None):
     """clearlogs -- Clears the bots log(s)."""
@@ -136,8 +139,11 @@ def clearlogs(inp, input=None):
 @hook.command(permissions=["botcontrol"])
 def join(inp, conn=None, notice=None):
     """join <channel> -- Joins <channel>."""
-    notice("Attempting to join {}...".format(inp))
-    conn.join(inp)
+    for target in inp.split(" "):
+        if not target.startswith("#"):
+            target = "#{}".format(target)
+        notice("Attempting to join {}...".format(target))
+        conn.join(target)
 
 
 @hook.command(autohelp=False, permissions=["botcontrol"])
@@ -146,11 +152,14 @@ def part(inp, conn=None, chan=None, notice=None):
     If [channel] is blank the bot will leave the
     channel the command was used in."""
     if inp:
-        target = inp
+        targets = inp
     else:
-        target = chan
-    notice("Attempting to leave {}...".format(target))
-    conn.part(target)
+        targets = chan
+    for target in targets.split(" "):
+        if not target.startswith("#"):
+            target = "#{}".format(target)
+        notice("Attempting to leave {}...".format(target))
+        conn.part(target)
 
 
 @hook.command(autohelp=False, permissions=["botcontrol"])
@@ -191,11 +200,11 @@ def say(inp, conn=None, chan=None):
     the command was used in."""
     inp = inp.split(" ")
     if inp[0][0] == "#":
-        message = " ".join(inp[1:])
-        out = "PRIVMSG {} :{}".format(inp[0], message)
+        message = u" ".join(inp[1:])
+        out = u"PRIVMSG {} :{}".format(inp[0], message)
     else:
-        message = " ".join(inp[0:])
-        out = "PRIVMSG {} :{}".format(chan, message)
+        message = u" ".join(inp[0:])
+        out = u"PRIVMSG {} :{}".format(chan, message)
     conn.send(out)
 
 
@@ -211,11 +220,11 @@ def me(inp, conn=None, chan=None):
         for x in inp[1:]:
             message = message + x + " "
         message = message[:-1]
-        out = "PRIVMSG {} :\x01ACTION {}\x01".format(inp[0], message)
+        out = u"PRIVMSG {} :\x01ACTION {}\x01".format(inp[0], message)
     else:
         message = ""
         for x in inp[0:]:
             message = message + x + " "
         message = message[:-1]
-        out = "PRIVMSG {} :\x01ACTION {}\x01".format(chan, message)
+        out = u"PRIVMSG {} :\x01ACTION {}\x01".format(chan, message)
     conn.send(out)

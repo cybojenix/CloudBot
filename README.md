@@ -21,7 +21,7 @@ CloudBot is a Python IRC bot based on [Skybot](http://git.io/skybot) by [rmmh](h
 
 ## Getting and using CloudBot
 
-### Download
+### Download 
 
 Get CloudBot at [https://github.com/ClouDev/CloudBot/zipball/develop](https://github.com/ClouDev/CloudBot/zipball/develop "Get CloudBot from Github!").
 
@@ -95,7 +95,7 @@ CloudBot is **licensed** under the **GPL v3** license. The terms are as follows.
 
     CloudBot
 
-    Copyright © 2011-2013 Luke Rogers
+    Copyright © 2011-2014 Luke Rogers
 
     CloudBot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

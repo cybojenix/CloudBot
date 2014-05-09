@@ -1,6 +1,8 @@
-from util import hook, http, web, text
 from urllib import urlencode
 import re
+
+from util import hook, http, web, text
+
 
 sc_re = (r'(.*:)//(www.)?(soundcloud.com)(.*)', re.I)
 api_url = "http://api.soundcloud.com"
@@ -21,7 +23,7 @@ def soundcloud(url, api_key):
 
     url = web.try_isgd(data['permalink_url'])
 
-    return u"SoundCloud track: \x02{}\x02 by \x02{}user\x02 {}{}- {} plays, {} downloads, {} comments - {}".format(
+    return u"SoundCloud track: \x02{}\x02 by \x02{}\x02 {}{}- {} plays, {} downloads, {} comments - {}".format(
         data['title'], data['user']['username'], desc, genre, data['playback_count'], data['download_count'],
         data['comment_count'], url)
 

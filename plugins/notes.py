@@ -1,16 +1,18 @@
-from util import hook
 import re
 
-db_inited = False
+from util import hook
 
 
-def cleanSQL(sql):
+db_ready = False
+
+
+def clean_sql(sql):
     return re.sub(r'\s+', " ", sql).strip()
 
 
 def db_init(db):
-    global db_inited
-    if db_inited:
+    global db_ready
+    if db_ready:
         return
 
     exists = db.execute("""
@@ -20,7 +22,7 @@ def db_init(db):
     """).fetchone()[0] == 1
 
     if not exists:
-        db.execute(cleanSQL("""
+        db.execute(clean_sql("""
            create virtual table todos using fts4(
                 user,
                 text,
@@ -30,7 +32,7 @@ def db_init(db):
 
     db.commit()
 
-    db_inited = True
+    db_ready = True
 
 
 def db_getall(db, nick, limit=-1):
@@ -44,14 +46,14 @@ def db_getall(db, nick, limit=-1):
         """, (nick, limit))
 
 
-def db_get(db, nick, id):
+def db_get(db, nick, note_id):
     return db.execute("""
         select added, text from todos
         where lower(user) = lower(?)
         order by added desc
         limit 1
         offset ?
-    """, (nick, id)).fetchone()
+    """, (nick, note_id)).fetchone()
 
 
 def db_del(db, nick, limit='all'):
@@ -91,7 +93,7 @@ def db_search(db, nick, query):
 @hook.command("notes")
 @hook.command
 def note(inp, nick='', chan='', db=None, notice=None, bot=None):
-    "note(s) <add|del|list|search> args -- Manipulates your list of notes."
+    """note(s) <add|del|list|search> args -- Manipulates your list of notes."""
 
     db_init(db)
 

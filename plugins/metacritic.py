@@ -9,15 +9,13 @@ from util import hook, http
 @hook.command('mc')
 @hook.command
 def metacritic(inp):
-    """mc [all|movie|tv|album|x360|ps3|wii|pc|ds|3ds|vita] <title>
+    """mc [all|movie|tv|album|x360|ps3|pc|gba|ds|3ds|wii|vita|wiiu|xone|ps4] <title>
     Gets rating for <title> from metacritic on the specified medium."""
-
-    # if the results suck, it's metacritic's fault
 
     args = inp.strip()
 
-    game_platforms = ('x360', 'ps3', 'pc', 'ds', 'wii', '3ds', 'gba',
-                      'psp', 'vita')
+    game_platforms = ('x360', 'ps3', 'pc', 'gba', 'ds', '3ds', 'wii',
+                      'vita', 'wiiu', 'xone', 'ps4')
 
     all_platforms = game_platforms + ('all', 'movie', 'tv', 'album')
 
@@ -43,38 +41,7 @@ def metacritic(inp):
     except HTTPError:
         return 'error fetching results'
 
-    ''' result format:
-    -- game result, with score
-    -- subsequent results are the same structure, without first_result class
-    <li class="result first_result">
-        <div class="result_type">
-            <strong>Game</strong>
-            <span class="platform">WII</span>
-        </div>
-        <div class="result_wrap">
-            <div class="basic_stats has_score">
-                <div class="main_stats">
-                    <h3 class="product_title basic_stat">...</h3>
-                    <div class="std_score">
-                      <div class="score_wrap">
-                        <span class="label">Metascore: </span>
-                        <span class="data metascore score_favorable">87</span>
-                      </div>
-                    </div>
-                </div>
-                <div class="more_stats extended_stats">...</div>
-            </div>
-        </div>
-    </li>
-
-    -- other platforms are the same basic layout
-    -- if it doesn't have a score, there is no div.basic_score
-    -- the <div class="result_type"> changes content for non-games:
-    <div class="result_type"><strong>Movie</strong></div>
-    '''
-
     # get the proper result element we want to pull data from
-
     result = None
 
     if not doc.find_class('query_results'):
@@ -128,7 +95,7 @@ def metacritic(inp):
         release = None
 
     try:
-        score = result.find_class('metascore')[0].text_content()
+        score = result.find_class('metascore_w')[0].text_content()
     except IndexError:
         score = None
 

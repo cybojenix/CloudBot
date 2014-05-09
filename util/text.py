@@ -144,7 +144,9 @@ def truncate_words(content, length=10, suffix='...'):
 
 # from <http://stackoverflow.com/questions/250357/smart-truncate-in-python>
 def truncate_str(content, length=100, suffix='...'):
-    """Truncates a string after a certain number of chars."""
+    """Truncates a string after a certain number of chars.
+    @rtype : str
+    """
     if len(content) <= length:
         return content
     else:
@@ -184,7 +186,7 @@ def truncate_str(content, length=100, suffix='...'):
 # Expression to match some_token and some_token="with spaces" (and similarly
 # for single-quoted strings).
 
-split_re = re.compile(r"""((?:[^\s'"]*(?:(?:"(?:[^"\\]|\\.)*" | '(?:[""" \
+split_re = re.compile(r"""((?:[^\s'"]*(?:(?:"(?:[^"\\]|\\.)*" | '(?:["""
                       r"""^'\\]|\\.)*')[^\s'"]*)+) | \S+)""", re.VERBOSE)
 
 

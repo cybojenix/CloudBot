@@ -1,9 +1,13 @@
 # Written by Scaevolus 2010
-from util import hook, http, text, execute
 import string
 import re
 
+from util import hook, http, text, pyexec
+
+
 re_lineends = re.compile(r'[\r\n]*')
+
+db_ready = []
 
 # some simple "shortcodes" for formatting purposes
 shortcodes = {
@@ -15,10 +19,13 @@ shortcodes = {
     '[/i]': '\x16'}
 
 
-def db_init(db):
-    db.execute("create table if not exists mem(word, data, nick,"
-               " primary key(word))")
-    db.commit()
+def db_init(db, conn):
+    global db_ready
+    if not conn.name in db_ready:
+        db.execute("create table if not exists mem(word, data, nick,"
+                   " primary key(word))")
+        db.commit()
+        db_ready.append(conn.name)
 
 
 def get_memory(db, word):
@@ -32,12 +39,14 @@ def get_memory(db, word):
 
 @hook.command("r", permissions=["addfactoid"])
 @hook.command(permissions=["addfactoid"])
-def remember(inp, nick='', db=None, notice=None):
+def remember(inp, nick='', db=None, notice=None, conn=None):
     """remember <word> [+]<data> -- Remembers <data> with <word>. Add +
     to <data> to append."""
-    db_init(db)
+    db_init(db, conn)
 
     append = False
+
+    inp = string.replace(inp, "\\n", "\n")
 
     try:
         word, data = inp.split(None, 1)
@@ -62,27 +71,27 @@ def remember(inp, nick='', db=None, notice=None):
 
     if old_data:
         if append:
-            notice("Appending \x02{}\x02 to \x02{}\x02".format(new_data, old_data))
+            notice(u"Appending \x02{}\x02 to \x02{}\x02. Type ?{} to see it.".format(new_data, old_data, word))
         else:
-            notice('Remembering \x02{}\x02 for \x02{}\x02. Type ?{} to see it.'.format(data, word, word))
-            notice('Previous data was \x02{}\x02'.format(old_data))
+            notice(u'Remembering \x02{}\x02 for \x02{}\x02. Type ?{} to see it.'.format(data, word, word))
+            notice(u'Previous data was \x02{}\x02'.format(old_data))
     else:
-        notice('Remembering \x02{}\x02 for \x02{}\x02. Type ?{} to see it.'.format(data, word, word))
+        notice(u'Remembering \x02{}\x02 for \x02{}\x02. Type ?{} to see it.'.format(data, word, word))
 
 
 @hook.command("f", permissions=["delfactoid"])
 @hook.command(permissions=["delfactoid"])
-def forget(inp, db=None, notice=None):
+def forget(inp, db=None, notice=None, conn=None):
     """forget <word> -- Forgets a remembered <word>."""
 
-    db_init(db)
+    db_init(db, conn)
     data = get_memory(db, inp)
 
     if data:
         db.execute("delete from mem where word=lower(?)",
                    [inp])
         db.commit()
-        notice('"%s" has been forgotten.' % data.replace('`', "'"))
+        notice(u'"%s" has been forgotten.' % data.replace('`', "'"))
         return
     else:
         notice("I don't know about that.")
@@ -90,10 +99,10 @@ def forget(inp, db=None, notice=None):
 
 
 @hook.command
-def info(inp, notice=None, db=None):
+def info(inp, notice=None, db=None, conn=None):
     """info <factoid> -- Shows the source of a factoid."""
 
-    db_init(db)
+    db_init(db, conn)
 
     # attempt to get the factoid from the database
     data = get_memory(db, inp.strip())
@@ -106,13 +115,13 @@ def info(inp, notice=None, db=None):
 
 @hook.regex(r'^\? ?(.+)')
 def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=None):
-    "?<word> -- Shows what data is associated with <word>."
+    """?<word> -- Shows what data is associated with <word>."""
     try:
         prefix_on = bot.config["plugins"]["factoids"].get("prefix", False)
     except KeyError:
         prefix_on = False
 
-    db_init(db)
+    db_init(db, conn)
 
     # split up the input
     split = inp.group(1).strip().split(" ")
@@ -129,9 +138,9 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
         # factoid preprocessors
         if data.startswith("<py>"):
             code = data[4:].strip()
-            variables = 'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}";'.format(arguments.replace('"', '\\"'),
-                                                                                  input.nick, input.chan,
-                                                                                  input.conn.nick)
+            variables = u'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}";'.format(arguments.replace('"', '\\"'),
+                                                                                       input.nick, input.chan,
+                                                                                       input.conn.nick)
             if code.startswith("<force>"):
                 code = code[8:].strip()
                 result = execute.eval_py(variables + code, paste_multiline=False)
@@ -157,11 +166,26 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
                 result = result.strip("\r").split("\n")
                 for output in result:
                     if prefix_on:
-                        message("\x02[{}]:\x02 {}".format(factoid_id, output))
+                        message(u"\x02[{}]:\x02 {}".format(factoid_id, output))
                     else:
                         message(output)
             else:
                 if prefix_on:
-                    message("\x02[{}]:\x02 {}".format(factoid_id, result))
+                    message(u"\x02[{}]:\x02 {}".format(factoid_id, result))
                 else:
                     message(result)
+
+
+@hook.command(autoHelp=False, permissions=["listfactoids"])
+def listfactoids(inp, db=None, conn=None, reply=None):
+    db_init(db, conn)
+    text = False
+    for word in db.execute("select word from mem").fetchall():
+        if not text:
+            text = word[0]
+        else:
+            text += u", {}".format(word[0])
+        if len(text) > 400:
+            reply(text.rsplit(u', ', 1)[0])
+            text = word[0]
+    return text
