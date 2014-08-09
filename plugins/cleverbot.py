@@ -2,6 +2,7 @@ from urllib import urlencode
 from urllib2 import urlopen
 import md5
 from util import hook
+import socket
 
 def _utils_string_at_index(strings, index):
     if len(strings) > index:
@@ -31,7 +32,13 @@ class CleverBot(object):
         self.data = data + '&icognocheck=' + data_digest
         
     def get_response(self):
-        url_response = urlopen(self.url, self.data).read()
+        try:
+            url_response = urlopen(self.url, self.data).read()
+        except socket.timeout:  # just try again, it should work
+            try:
+                url_response = urlopen(self.url, self.data).read()
+            except socket.timeout:
+                return "timeout error. sorry :/"
         self.response_values = url_response.split('\r')
         
     def get_vars(self):
@@ -65,18 +72,31 @@ class CleverBot(object):
     def get_reply(self, thought):
         self.thought = thought
         self.digester()
-        self.get_response()
+        blah = self.get_response()
+        if blah:
+            return blah
         self.get_vars()
         
         return self.reply
     
 @hook.command("cb")
+@hook.command("ai")
 def cleverbot(inp, reply=None):
     cb = CleverBot()
     message = cb.get_reply(inp)
     reply(message)
+
+@hook.event('PRIVMSG')
+def cb(inp, reply=None, bot=None):
+    if inp[1][:8].lower() in ['slimbot:', 'slimbot,']:
+        inp = inp[1][8:].strip()
+        for plug in bot.plugs['command']:
+            if plug[1]['name'].lower().startswith(inp.split(' ')[0].lower()):
+                return
+        cb = CleverBot()
+        message = cb.get_reply(inp)
+        reply(message)
     
 if __name__ == '__main__':
     cleverbot = CleverBot()
     print cleverbot.think_thought("hello")
-

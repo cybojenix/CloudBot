@@ -101,29 +101,68 @@ def slimsearch(inp, notice=None, say=None):
 		message = search + ": " + output_url
 		say(message)
 '''
+@hook.command		
+def slimsearch(inp, notice=None, conn=None, chan=None):
+	"slimsearch - query the list of devices to get the url from the website," \
+	" for a list of devices, run slimdevices"
+	
+	if not os.path.isfile('plugins/data/ota.xml'):
+		urllib.urlretrieve("http://otaslim.slimroms.net/ota.xml", "plugins/data/ota.xml")
+	if time.time() - os.path.getmtime('plugins/data/ota.xml') > (60*30):
+		urllib.urlretrieve("http://otaslim.slimroms.net/ota.xml", "plugins/data/ota.xml")
+	inp = inp.split(" ")
+	search = inp[0]
+	message = ""
+	root = ET.parse('plugins/data/ota.xml').getroot()
+	
+	for url in root.iter(search):
+		output_url = url[1].text
+		
+	try:
+		output_url
+	except NameError:
+		message = search + " not found, please run the slimdevices command"
+		notice(message)
+	else:
+		message = search + ": " + output_url
+		out = "PRIVMSG %s :%s" % (chan, message)
+		conn.send(out)
+
 @hook.command
 def slimdetect(inp, conn=None, chan=None):
+    """as per the request of the NSA, this command is added in to track people's phones"""
     global slimchannel
     global slimuser
     inp = inp.split(" ")
-    slimuser = inp[0]
-    slimchannel = chan
+    if not 'slimuser' in globals():
+        slimuser = []
+    if not 'slimchannel' in globals():
+        slimchannel = {}
+    slimuser.append(inp[0])
+    slimchannel[inp[0]] = chan
     message = "\001%s\001" % ("VERSION")
-    out = "PRIVMSG %s :%s" % (slimuser, message)
+    out = "PRIVMSG %s :%s" % (inp[0], message)
     conn.send(out)
 
 @hook.event("NOTICE")
 def ctcp_capture(inp, conn=None, input=None):
         global slimchannel
         global slimuser
-        if "VERSION" in input.msg and "Android IRC" in input.msg:
-            if  slimchannel \
-              and input.nick == slimuser and slimuser:
+        if "VERSION" in input.msg and "Android" in input.msg:
+            if  slimchannel and slimuser\
+              and input.nick in  slimuser:
                 message = re.sub("(.*on )|( \(.*\))","",input.msg)
                 message = input.nick + " - " + message.replace('\x01', '')
-                out = "PRIVMSG %s :%s" % (slimchannel, message)
-                slimchannel = None
-                slimuser = None
+                out = "PRIVMSG %s :%s" % (slimchannel[input.nick], message)
+                slimchannel.pop(input.nick)
+                slimuser.remove(input.nick)
                 conn.send(out)
             else:
-                input.reply("fuck you %s trying to go through the ctcp capture" % input.nick)
+                input.reply("please stop trying to go through the ctcp capture")
+        elif slimuser and slimchannel \
+          and input.nick in slimuser:
+            message = input.nick + " is not on Slim IRC."
+            out = "PRIVMSG %s :%s" % (slimchannel[input.nick], message)
+            slimchannel.pop(input.nick)
+            slimuser.remove(input.nick)
+            conn.send(out)

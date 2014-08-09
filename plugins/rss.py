@@ -16,6 +16,8 @@ def rss(inp, message=None):
         feed = "http://xkcd.com/rss.xml"
     elif strip == "ars":
         feed = "http://feeds.arstechnica.com/arstechnica/index"
+    elif strip == "xda":
+        feed = "http://feeds.feedburner.com/xda-developers/ShsH?format=xml"
     else:
         feed = inp
 

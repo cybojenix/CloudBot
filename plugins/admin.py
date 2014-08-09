@@ -139,11 +139,10 @@ def clearlogs(inp, input=None):
 @hook.command(permissions=["botcontrol"])
 def join(inp, conn=None, notice=None):
     """join <channel> -- Joins <channel>."""
-    for target in inp.split(" "):
-        if not target.startswith("#"):
-            target = "#{}".format(target)
-        notice("Attempting to join {}...".format(target))
-        conn.join(target)
+    if not inp.startswith("#"):
+        target = "#{}".format(target)
+    notice("Attempting to join {}...".format(inp))
+    conn.join(inp)
 
 
 @hook.command(autohelp=False, permissions=["botcontrol"])
@@ -193,7 +192,7 @@ def raw(inp, conn=None, notice=None):
     conn.send(inp)
 
 
-@hook.command(permissions=["botcontrol"])
+@hook.command(permissions=["botcontrol", "say"])
 def say(inp, conn=None, chan=None):
     """say [channel] <message> -- Makes the bot say <message> in [channel].
     If [channel] is blank the bot will say the <message> in the channel

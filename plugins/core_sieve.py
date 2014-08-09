@@ -36,7 +36,6 @@ def sieve_suite(bot, input, func, kind, args):
 
     if args.get('permissions', False):
         groups = bot.config.get("permissions", [])
-	print "groups %s" % groups
 
         allowed_permissions = args.get('permissions', [])
 
@@ -52,7 +51,6 @@ def sieve_suite(bot, input, func, kind, args):
                     group_users = [_mask.lower() for _mask in group["users"]]
                     for pattern in group_users:
                         if fnmatch(mask, pattern):
-                            print "Allowed group {}.".format(group)
                             return input
 
         input.notice("Sorry, you are not allowed to use this command.")
