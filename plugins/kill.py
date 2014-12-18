@@ -10,7 +10,7 @@ def get_generator(_json, variables):
 
 
 @hook.command
-def kill(inp, action=None, nick=None, conn=None, notice=None):
+def kill(inp, action=None, nick=None, conn=None, notice=None, bot=None):
     """kill <user> -- Makes the bot kill <user>."""
     target = inp.strip()
 
@@ -21,6 +21,11 @@ def kill(inp, action=None, nick=None, conn=None, notice=None):
     # if the user is trying to make the bot kill itself, kill them
     if target.lower() == conn.nick.lower() or target.lower() == "itself":
         target = nick
+
+    masters = bot.config.get("masters", [])
+    if masters:
+        if target.lower() in masters:
+            target = nick
 
     variables = {
         "user": target

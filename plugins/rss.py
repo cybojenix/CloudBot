@@ -23,7 +23,7 @@ def rss(inp, message=None):
 
     query = "SELECT title, link FROM rss WHERE url=@feed LIMIT @limit"
     result = web.query(query, {"feed": feed, "limit": limit})
-
+    print result.raw
     if not result.rows:
         return "Could not find/read RSS feed."
 

@@ -128,7 +128,7 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
     factoid_id = split[0]
 
     if len(split) >= 1:
-        arguments = " ".join(split[1:])
+        arguments = u" ".join(split[1:])
     else:
         arguments = ""
 
@@ -138,16 +138,16 @@ def factoid(inp, message=None, db=None, bot=None, action=None, conn=None, input=
         # factoid preprocessors
         if data.startswith("<py>"):
             code = data[4:].strip()
-            variables = 'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}"; '.format(arguments.replace('"', '\\"'),
+            variables = u'input="""{}"""; nick="{}"; chan="{}"; bot_nick="{}"; '.format(arguments.replace('"', '\\"'),
                                                                                        input.nick, input.chan,
                                                                                        input.conn.nick)
             if code.startswith("<force>"):
                 code = code[8:].strip()
-                result = pyexec.eval_py(variables + code, paste_multiline=False)
+                result = unicode(pyexec.eval_py(variables + code, paste_multiline=False))
             else:
-                result = pyexec.eval_py(variables + code)
+                result = unicode(pyexec.eval_py(variables + code))
         else:
-            result = data
+            result = unicode(data)
 
         # factoid postprocessors
         result = text.multiword_replace(result, shortcodes)

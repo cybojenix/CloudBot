@@ -88,7 +88,7 @@ def cleverbot(inp, reply=None):
 
 @hook.event('PRIVMSG')
 def cb(inp, reply=None, bot=None):
-    if inp[1][:8].lower() in ['slimbot:', 'slimbot,']:
+    if inp[1][:8].lower() in ['slimbot:', 'slimbot,', 'thlgbot,', 'thlgbot:']:
         inp = inp[1][8:].strip()
         for plug in bot.plugs['command']:
             if plug[1]['name'].lower().startswith(inp.split(' ')[0].lower()):

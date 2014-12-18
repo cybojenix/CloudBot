@@ -23,7 +23,6 @@ def googleimage(inp):
         return 'no images found'
     return random.choice(parsed['responseData']['results'][:10])['unescapedUrl']
 
-
 @hook.command('search')
 @hook.command('g')
 @hook.command

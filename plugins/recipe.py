@@ -11,12 +11,12 @@ random_url = search_url + "/surprise"
 # set this to true to censor this plugin!
 censor = True
 phrases = [
-    u"EAT SOME FUCKING \x02{}\x02",
-    u"YOU WON'T NOT MAKE SOME FUCKING \x02{}\x02",
-    u"HOW ABOUT SOME FUCKING \x02{}?\x02",
-    u"WHY DON'T YOU EAT SOME FUCKING \x02{}?\x02",
-    u"MAKE SOME FUCKING \x02{}\x02",
-    u"INDUCE FOOD COMA WITH SOME FUCKING \x02{}\x02"
+    u"eat some \x02{}\x02",
+    u"you won't not want some \x02{}\x02",
+    u"how about some \x02{}?\x02",
+    u"why don't you try some \x02{}?\x02",
+    u"make some \x02{}\x02",
+    u"induce food coma with some \x02{}\x02"
 ]
 
 clean_key = lambda i: i.split("#")[1]
@@ -97,10 +97,8 @@ def dinner(inp):
     except ParseError as e:
         return "Could not parse recipe: {}".format(e)
 
-    name = data["name"].strip().upper()
+    name = data["name"].strip()
     text = random.choice(phrases).format(name)
 
-    if censor:
-        text = text.replace("FUCK", "F**K")
-
     return u"{} - {}".format(text, web.try_isgd(url))
+	
