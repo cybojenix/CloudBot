@@ -19,6 +19,9 @@ def correction_logic(match, delim, input, conn, message, nick):
         return u"Nothing to replace"
     replace = split[2]
 
+    if not find and not find.isspace():
+        return u"Find must not be blank."
+
     for item in conn.history[input.chan].__reversed__():
         name, timestamp, msg = item
         if msg[:2] in ["s%s" % d for d in delims]:

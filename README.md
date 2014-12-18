@@ -1,5 +1,7 @@
 # CloudBot
 
+Important:  This repository is a *legacy* version of Cloudbot, whereas the [Refresh](http://github.com/CloudBotIRC/CloudBotRefresh/) version of CloudBot is a newer version, which runs on Python 3.4. This version is **discontinued** and **no longer maintained** by the core team, so we suggest you update to CloudBotRefresh.
+
 ## About
 
 CloudBot is a Python IRC bot based on [Skybot](http://git.io/skybot) by [rmmh](http://git.io/rmmh).
@@ -95,7 +97,7 @@ CloudBot is **licensed** under the **GPL v3** license. The terms are as follows.
 
     CloudBot
 
-    Copyright © 2011-2014 Luke Rogers
+    Copyright © 2011-2014 Luke Rogers and CloudBot Contributors
 
     CloudBot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
