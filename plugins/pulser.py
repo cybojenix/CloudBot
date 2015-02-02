@@ -9,7 +9,7 @@ def pulser(match, message=None, nick=None):
     if nick.lower() == "pulser":
         return
     t = time()
-    if _pulser_last_pinged and _pulser_last_pinged - t < 60*5:
+    if _pulser_last_pinged and t - _pulser_last_pinged < 60*5:
         return
     _pulser_last_pinged = t
     message(u"pulser, %s is talking about Clouds!!" % nick)
