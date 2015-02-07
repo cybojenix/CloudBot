@@ -3,7 +3,7 @@ from time import time
 
 _pulser_last_pinged = {}
 
-@hook.regex(r'.*(?i)cloud.*')
+#@hook.regex(r'.*(?i)cloud.*')
 def pulser(match, message=None, nick=None, chan=None):
     global _pulser_last_pinged
     if nick.lower() == "pulser":
