@@ -14,3 +14,4 @@ gitflow
 plugins/data/GeoLiteCity.dat
 plugins/data/*grouper*
 plugins/data/ota*
+plugins/data/rr/*
