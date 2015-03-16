@@ -140,7 +140,7 @@ def slimdetect(inp, conn=None, chan=None):
         slimchannel = {}
     slimuser.append(inp[0])
     slimchannel[inp[0]] = chan
-    message = "\001%s\001" % ("VERSION")
+    message = "\001%s \001" % ("VERSION")
     out = "PRIVMSG %s :%s" % (inp[0], message)
     conn.send(out)
 

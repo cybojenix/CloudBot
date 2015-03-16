@@ -6,7 +6,7 @@ import json
 import time
 
 @hook.command(autohelp=False)
-def load(inp, say=None, me=None, chan=None):
+def load(inp, message=None, action=None, chan=None):
 	"load [<number of barrels>] [<number of bullets>] - " \
 	" load the gun up"
 	dir = "plugins/data/rr/"
@@ -40,7 +40,7 @@ def load(inp, say=None, me=None, chan=None):
 	
 	bullet_place = []
 	
-	me("loads the bullets, spins the barrel...")
+	action("loads the bullets, spins the barrel...")
 	for x in range(no_bullet):
 		bul_pl = random.randint(1, no_barrels)
 		while bul_pl in bullet_place:
@@ -51,10 +51,10 @@ def load(inp, say=None, me=None, chan=None):
 	with open(file, 'w+') as final_file:
 		final_file.write(data)
 	
-	say("the bullets have been loaded. pull the trigger...")
+	message("the bullets have been loaded. pull the trigger...")
 
 @hook.command(autohelp=False)
-def pull(inp, say=None, nick=None, notice=None, me=None, chan=None):
+def pull(inp, message=None, nick=None, notice=None, action=None, chan=None):
 	"pull the trigger"
 	file = "plugins/data/rr/" + chan
 	if not os.path.exists(file):
@@ -69,26 +69,26 @@ def pull(inp, say=None, nick=None, notice=None, me=None, chan=None):
 		dead = data["dead"]
 		
 		if nick in dead:
-			say("you can not shoot if you are dead %s" % nick)
+			message("you can not shoot if you are dead %s" % nick)
 		else:
 			if no_bullet == 0:
 				notice("please start a game with command load")
 			else:
-				say("click....")
+				message("click....")
 				time.sleep(2)
 				current_position += 1
 				if current_position in bullet_place:
-					say("BANG!! %s is DEAD" % nick)
+					message("BANG!! %s is DEAD" % nick)
 					no_bullet -= 1
 					dead.append(nick)
 				
 					if chan[0] == "#":
-						me("drags the body off...")
+						action("drags the body off...")
 						out = "KICK %s %s : you died...." % (chan, nick)
 				else:
-					say("%s gets to live another day.." % nick)
+					message("%s gets to live another day.." % nick)
 				if no_bullet == 0:
-					say("there are no bullets left")
+					message("there are no bullets left")
 
 				data = json.dumps({'no_bullet': no_bullet, 'current_position': current_position, 'bullet_place': bullet_place, 'dead': dead})
 				with open(file, 'w+') as final_file:

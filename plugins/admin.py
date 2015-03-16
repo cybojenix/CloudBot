@@ -145,7 +145,7 @@ def join(inp, conn=None, notice=None):
     conn.join(inp)
 
 
-@hook.command(autohelp=False, permissions=["botcontrol"])
+@hook.command("gtfo", autohelp=False, permissions=["botcontrol"])
 def part(inp, conn=None, chan=None, notice=None):
     """part <channel> -- Leaves <channel>.
     If [channel] is blank the bot will leave the
