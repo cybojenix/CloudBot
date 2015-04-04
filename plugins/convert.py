@@ -9,7 +9,7 @@ def load_data(api_key):
     global _conv_data
     global _conv_last_edit
 
-    if _conv_last_edit is not None and _conv_data and _conv_last_edit - time() < 1800:
+    if _conv_last_edit is not None and _conv_data and _conv_last_edit - time() < 2700:
         return _conv_data
 
     _conv_last_edit = time()
