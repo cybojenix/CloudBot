@@ -16,7 +16,7 @@ def ignore_sieve(bot, input, func, type, args):
 
     if ignorelist:
         for pattern in ignorelist:
-            if pattern.startswith("#") and pattern in ignorelist:
+            if pattern.startswith("#") and pattern == input.chan:
                 if input.command == "PRIVMSG" and input.lastparam[1:] == "unignore":
                     return input
                 else:
