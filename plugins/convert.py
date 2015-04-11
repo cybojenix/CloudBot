@@ -9,7 +9,7 @@ def load_data(api_key):
     global _conv_data
     global _conv_last_edit
 
-    if _conv_last_edit is not None and _conv_data and _conv_last_edit - time() < 2700:
+    if _conv_last_edit is not None and _conv_data and time() - _conv_last_edit < 2700:
         return _conv_data
 
     _conv_last_edit = time()
@@ -57,5 +57,5 @@ def convert(inp, bot=None):
     if t is None:
         return "target currency not known"
 
-    value = float(amount)/(float(f)*float(t))
+    value = (float(amount)/float(f))*float(t)
     return "{:.2f} {} is {:.2f} {}".format(amount, ffrom, value, to)
