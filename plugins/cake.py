@@ -12,7 +12,7 @@ def cake(inp, action=None):
     """cake <user> - Gives <user> an awesome cake."""
     inp = inp.strip()
 
-    if not re.match("^[A-Za-z0-9_|.-\]\[]*$", inp.lower()):
+    if not re.match("^[A-Za-z0-9_|.\-\]\[]*$", inp.lower()):
         return "I can't give an awesome cake to that user!"
 
     cake_type = random.choice(cakes)
