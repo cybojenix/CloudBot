@@ -18,7 +18,7 @@ def cookie(inp, action=None):
     """cookie <user> - Gives <user> a cookie"""
     inp = inp.strip()
 
-    if not re.match("^[A-Za-z0-9_|.-\]\[]*$", inp.lower()):
+    if not re.match("^[A-Za-z0-9_|.\-\]\[]*$", inp.lower()):
         return "I can't give a cookie to that user!"
 
     cookie_type = random.choice(cookies)
