@@ -31,17 +31,27 @@ def convert(inp, bot=None):
     parts = input.split()
 
     try:
+        parts.remove('TO')
+    except ValueError:
+        pass
+
+    amount = None
+    for x in list(parts):
+        try:
+            amount = float(x)
+        except ValueError:
+            pass
+        else:
+            parts.remove(x)
+            break
+    else:
+        amount = 1.0
+
+    try:
         ffrom = parts[0]
         to = parts[1]
     except IndexError:
         return "invalid arguments"
-
-    try:
-        amount = float(parts[2])
-    except IndexError:
-        amount = 1
-    except ValueError:
-        return "only use numbers for the quantity"
 
     data = load_data(api_key)
     if not data:
