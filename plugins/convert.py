@@ -47,12 +47,11 @@ def convert(inp, bot=None):
     else:
         amount = 1.0
 
-    # this, or try/except
-    if (len(parts) != 2):
+    try:
+        ffrom = parts[0]
+        to = parts[1]
+    except IndexError:
         return "invalid arguments"
-
-    ffrom = parts[0]
-    to = parts[1]
 
     data = load_data(api_key)
     if not data:
