@@ -36,13 +36,15 @@ def convert(inp, bot=None):
         pass
 
     amount = None
-    for x in parts:
+    for x in list(parts):
         try:
             amount = float(x)
-            parts.remove(x)
         except ValueError:
             pass
-    if (amount == None):
+        else:
+            parts.remove(x)
+            break
+    else:
         amount = 1.0
 
     # this, or try/except
