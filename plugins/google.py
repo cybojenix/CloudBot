@@ -1,49 +1,61 @@
-import random
-
 from util import hook, http, text
 
 
-def api_get(kind, query):
-    """Use the RESTful Google Search API"""
-    url = 'http://ajax.googleapis.com/ajax/services/search/%s?' \
-          'v=1.0&safe=moderate'
-    return http.get_json(url % kind, q=query)
+API_CS = 'https://www.googleapis.com/customsearch/v1'
+
+
+def get_keys(config):
+    return {
+        'cx': config['api_keys']['google_cse_id'],
+        'key': config['api_keys']['google_dev_key']
+    }
+
+
+@hook.command('search')
+@hook.command('g')
+@hook.command
+def google(inp, bot=None):
+    try:
+        keys = get_keys(bot.config)
+    except KeyError:
+        return u"API Keys not configured"
+
+    parsed = http.get_json(API_CS, q=inp, **keys)
+
+    try:
+        result = parsed['items'][0]
+    except KeyError:
+        return u"No results found."
+
+    title = text.truncate_str(result['title'], 60)
+    content = result['snippet']
+
+    if not content:
+        content = "No description available."
+    else:
+        content = text.truncate_str(content.replace('\n', ''), 150)
+
+    return u'{} -- \x02{}\x02: "{}"'.format(result['link'], title, content)
 
 
 @hook.command('image')
 @hook.command('gis')
 @hook.command
-def googleimage(inp):
-    """gis <query> -- Returns first Google Image result for <query>."""
+def googleimage(inp, bot=None):
+    try:
+        keys = get_keys(bot.config)
+    except KeyError:
+        return u"API Keys not configured"
 
-    parsed = api_get('images', inp)
-    if not 200 <= parsed['responseStatus'] < 300:
-        raise IOError('error searching for images: {}: {}'.format(parsed['responseStatus'], ''))
-    if not parsed['responseData']['results']:
-        return 'no images found'
-    return random.choice(parsed['responseData']['results'][:10])['unescapedUrl']
+    parsed = http.get_json(API_CS, q=inp, searchType="image", **keys)
 
-@hook.command('search')
-@hook.command('g')
-@hook.command
-def google(inp):
-    """google <query> -- Returns first google search result for <query>."""
+    try:
+        result = parsed['items'][0]
+        metadata = parsed['items'][0]['image']
+    except KeyError:
+        return u"No results found."
 
-    parsed = api_get('web', inp)
-    if not 200 <= parsed['responseStatus'] < 300:
-        raise IOError('error searching for pages: {}: {}'.format(parsed['responseStatus'], ''))
-    if not parsed['responseData']['results']:
-        return 'No results found.'
+    dimens = '{}x{}px'.format(metadata['width'], metadata['height'])
+    title = text.truncate_str(result['title'], 60)
 
-    result = parsed['responseData']['results'][0]
-
-    title = http.unescape(result['titleNoFormatting'])
-    title = text.truncate_str(title, 60)
-    content = http.unescape(result['content'])
-
-    if not content:
-        content = "No description available."
-    else:
-        content = http.html.fromstring(content).text_content()
-        content = text.truncate_str(content, 150)
-    return u'{} -- \x02{}\x02: "{}"'.format(result['unescapedUrl'], title, content)
+    return u'{} [{}, {}]'.format(result['link'], dimens, result['mime'])
